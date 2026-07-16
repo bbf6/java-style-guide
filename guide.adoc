@@ -27,17 +27,17 @@ Este documento no es una lista de reglas a serguir ciegamente: Este documento no
 
 Este documento no es ese martillo que te hace ver a todo el mundo como un clavo. Es perfectamente normal que, mientras escribes código, termines encontrandote con "excepciones a la regla" y dependerá de ti, como el profesional que eres, discernir cuando dicha situación sea, dicha situación.
 
-Este documento no está escrito en piedra. Conforma el equipo de trabajo implementa las recomendaciones de este documento, se encontrarán eventualmente con situaciones que les hagan reevaluar, modificar, omitir y agregar tantas ideas como vean necesarias.
+Este documento no está escrito en piedra. Conforme el equipo de trabajo implementa las recomendaciones de este documento, se encontrarán eventualmente con situaciones que les hagan reevaluar, modificar, omitir y agregar tantas ideas como vean necesarias.
 
 === Consistencia
 
 En caso de duda la consistencia es la clave. Si en esta guía se ofrecen múltiples alternativas al momento de aplicar cierto estilo a un fragmento de código, o si un estilo no te convence entonces elige. Pero se consistente en todo el código de tu proyecto.
 
-Solo con ser consistentes, es posible reducir la cantidad de documentación y entrenamiento necesario para entender el sistema. La documentación puede ser más concisa, y una vez que un programador ha aprendido un programa o un modulo del mismo, puede intuir el resto del sistema.
+Solo con ser consistentes, es posible reducir la cantidad de documentación y entrenamiento necesario para entender el sistema. La documentación puede ser más concisa, y una vez que un programador ha aprendido un programa o un módulo del mismo, puede intuir el resto del sistema.
 
 === Simplicidad (principio KISS)
 
-Prioriza la simplicitad. Evita tanto ambigüedades de interpretación como código que sobreexplique su indención de uso.
+Prioriza la simplicitad. Evita tanto ambigüedades de interpretación como código que sobreexplique su intención de uso.
 
 Si existen muchas formas o estilos de escribir una solución a un problema, elige:
 
@@ -232,7 +232,7 @@ public class Session {
 public void login(String email, String password) {
   // ...
   // ¿Estamos seguros que este es el único lugar en el código donde esta variable
-  // es modificata?
+  // es modificada?
   Session.USER = new User();
   // ...
 }
@@ -280,26 +280,51 @@ List<BluetoothDevice> devices = BluetoothAdapter.getDefaultAdapter().getBondedDe
 
 Límita el ciclo de vida de tus variables locales al scope más reducido posible. Esto reduce incertidumbre respecto a donde y cuando una variable pueda lledar a cambiar de valor. Esto también ayuda a hacer énfasis sobre la intención de uso de dichas variables al no dar margen a la libre interpretación.
 
-[source,java]
-----
-
-----
-
 === Estructura
 
 ==== Programación declarativa VS programación imperativa
 
+La programación imperativa es una tendencia a la hora de programar que gira en torno a describir cómo implementar una solución, dando como resultado un código con una tendencia natural a degenerar en código espaguetti.
+
+La programación declarativa se enfoca en describir qué es lo que se quiere obtener, dando como resultado una lógica más concisa y un código más desacoplado.
+
+El enfoque declarativo hace que el código sea más fácil de leer y modificar, pero no siempre es la opción más eficiente en términos de rendimiento.
+
+Favorece el enfoque declarativo como el estilo default de abordar los problemas y el imperativo cuando el rendimiento de un fragmento de código es más reelevante que su lectura o incluso que su mantenimiento.
+
 ==== `Stream` y `foreach` para iterar arrays y colecciónes
+
+Para la mayoría de las iteraciones sobre colecciones, prefiere los métodos del API `Stream` (`map`, `filter`, `reduce`, etc.) y el bucle `for-each`.
+
+Usa `forEach` solo cuando el objetivo sea ejecutar una acción lateral
+(como imprimir o enviar a un log) y no necesites transformar los datos. En cualquier otro caso, prefiere operaciones de `Stream` que devuelvan un resultado.
 
 ==== `for` para iteraciones de arrays más complejas
 
+Usa `for` cuando necesites:
+
+- Acceder al índice del elemento.
+- Mutar el array/colección durante la iteración.
+- Iterar sobre múltiples colecciones en paralelo.
+- Un control muy especifico del flujo (saltos con `break` o `continue`, o steps mayores a 1 o incluso retrocesos en la iteración).
+
 ==== `while` y recursión para casos más meticulosos
+
+Usa `while` cuando el número de iteraciones no se conoce de antemano y depende de una condición que puede cambiar durante la ejecución.
+
+Como alternativa al `while` puedes usar recursión si el resultado es más fácil de leer. En Java, la recursión no está optimizada por defecto (sin `tail recursion`), así que evita profundidades muy grandes.
 
 ==== Una instrucción por línea
 
+Cada instrucción debe ocupar una línea separada.
+
 ==== Evita usar `this` cuando no se necesita
 
+Usa `this` únicamente cuando sea necesario para desambiguar entre un parámetro y un atributo de instancia con el mismo nombre. En cualquier otro caso, es innecesario y añade ruido al código.
 
+Muchos IDEs pueden ocultar este ruido mediante el resaltado sintáctico, pero el código fuente no debería depender de herramientas externas para cumplir con las buenas prácticas de desarrollo (como mucho, debe apoyarse en ellas).
+
+En constructores y setters, es habitual usar `this` para diferenciar parámetros de atributos. Pero en el resto del código, confía en que el compilador y el lector reconocerán el ámbito de la variable.
 
 === Espacios en blanco
 
@@ -331,11 +356,11 @@ Todos los operadores binarios del lenguaje deben llevar un espacio en blanco a a
 ----
 // incorrecto
 var farenheit=(celsius*(9/5))+32;
-var canAccess=user.isAdmin()||(user.isSupervisor()&&store.id==user.store.id);
+var canAccess=user.isAdmin()||(user.isSupervisor()&&store.getId()==user.getStore().getId());
 
 // correcto
 var farenheit = (celsius * (9 / 5)) + 32;
-var canAccess = user.isAdmin() || (user.isSupervisor() && store.id == user.store.id);
+var canAccess = user.isAdmin() || (user.isSupervisor() && store.getId() == user.getStore().getId());
 ----
 
 Los operadores unarios no llevan espacio de separación.
@@ -418,7 +443,7 @@ Cuando una línea de código se extiende demasiado en horizontal, es necesario l
 
 [source,java]
 ----
-// Si la frma de la clase ens demasiado extensa, separarla en varias líneas simplifica
+// Si la firma de la clase ens demasiado extensa, separarla en varias líneas simplifica
 // la lectura
 public class LazyDeployer
   extends Deployer
@@ -436,7 +461,7 @@ public boolean assemble(
   Callback callback
 ) {}
 
-// En secuenxias de llamadas es demasiado extensa, hay que evitar alcanzar el límite
+// En secuencias de llamadas es demasiado extensa, hay que evitar alcanzar el límite
 // de longitud de caracteres por línea colocando cada nueva invocación en una nueva
 // línea con el punto al comienzo de la misma.
 Arrays
@@ -448,7 +473,7 @@ Arrays
 
 Como alternativa, se sugiere que en estos casos la identación ha de ser el doble, de lo normal para evitar confundir la identación por desbordamiento de una línea de código, de la identación por anidación de bloques de código. En el caso de trabajar con 2 espacios, aquí se usarían 4; y en el caso de usar 4, pasaría a 8.
 
-Queda a criterio del desarrllador si es deseable decantarse por esta última opción. Pereo recureda mantener la consistencia en todo el proyecto.
+Queda a criterio del desarrllador si es deseable decantarse por esta última opción. Pero recureda mantener la consistencia en todo el proyecto.
 
 [source,java]
 ----
@@ -540,13 +565,13 @@ Una pregunta recurrente entre principiantes es ¿Porqué en la era de monitores 
 
 Esta es una heuristica inencionalmente imprecisa pero no deja de tener una base racional.
 
-En las imprentas y grupos editoriales es sabido desde hace más de un siglo que la longitud de una línea afecta directamente a la velocidad de lectura. A dia de hoy el conscenso en diseño es que la longitud de un bloque de texto debe estar entre los 600px y los 800px, que es lo justo para no depender de tu mirada periferica ni para tener que girar el cuello y que son las principales fuentes de cansancio en la lectura.
+En las imprentas y grupos editoriales es sabido desde hace más de un siglo que la longitud de una línea afecta directamente a la velocidad de lectura. A dia de hoy el conscenso en diseño es que la longitud de un bloque de texto debe estar entre los 600px y los 800px, que es lo justo para no depender de tu mirada periferica ni para tener que girar el cuello y que son las principales fuentes de fatiga en la lectura.
 
 En el caso del códido en texto monoespaciado, 100 caracteres es una aproximación descente a esa regla.
 
 Otras razones para preferir esta limitante es que en monitores grandes puedes abrir dos archivos de código simultaneamente. Además en las comparaciones de versiones con git pueden verse las dos versiones de un archivo sin problemas en doble columna.
 
-Otra heuristica un poco más elaborada pero que reafirma este punto, versa tal que así:
+Otra heurística un poco más elaborada pero que reafirma este punto, versa tal que así:
 
 Los humanos leemos cada línea de código en un programa de la misma forma que un interprete o un compilador lo hace; primero con un proceso de analisis léxico, seguido de un analisis sintactico y por último un analisis sémantico (por arriba de esto ya comienzan las abstracciones, casos de uso y dominio del sistema).
 
@@ -567,7 +592,7 @@ A nivel léxico, sintactico y semantico es fácil reconocer si una línea de có
 
 ==== Separación entre variables (de instancia y estáticas)
 
-Las contantes y variables no llevan separación por salto de línea. Pero es recomendable añadir una línea para separar las variables que son estáticas y las que son de instancia.
+Las constantes y variables no llevan separación por salto de línea. Pero es recomendable añadir una línea para separar las variables que son estáticas y las que son de instancia.
 
 [source,java]
 ----
@@ -691,7 +716,7 @@ Dicho de otra forma, estamos intentando segmentar/organizar el código por que l
 
 La solución es mover cada sección de código a su propia función. Así ganamos la oportunidad de explicitar (dar nombre) al proceso que estamos computando.
 
-También es importante señalar que separar en funciones más pequeñas no siempre simplifica el entendimiento del código por si mismo, pues si este mantiene un alto nivel de cohesión con la función principal, entonces las nuevas funciones, por pequeñas que sean, no pueden existir fuera de su conexto. Sin embargo, este es un primer paso en la dirección correcta en la busqueda de un diseño más correcto.
+También es importante señalar que separar en funciones más pequeñas no siempre simplifica el entendimiento del código por si mismo, pues si este mantiene un alto nivel de cohesión con la función principal, entonces las nuevas funciones, por pequeñas que sean, no pueden existir fuera de su conexto. Sin embargo, este es un primer paso en la dirección correcta en la búsqueda de un diseño más correcto.
 
 === Booleanos
 
@@ -766,7 +791,7 @@ En el caso de tus propias clases, sigue las siguientes recomendasciones sobre la
 - Verifica si el parametro a evaluar apunta al mismo objeto.
 - Verifica que el parametro no sea nulo.
 - Verifica que el parametro sea de la misma clase o un subtipo.
-- Compara los atributos primimtivos primero.
+- Compara los atributos primitivos primero.
 - Compara los atributos de objetos al final.
 
 Recuerda que la "igualdad" de dos objetos es un concepto subjetivo y es una decisión de diseño elegir cuales atributos son los minimos e indispensableas a la hora de comparar la igualdad de dos instancias.
@@ -797,7 +822,7 @@ class Store {
 
 ==== Usa `equals` para evaluar String
 
-Usa `equals` en vez de `==` para comparar strings. No importa que uses `interning` tendrías que remitirte hasta la asignación de la variable o a la llamada explicita de `intern()` para estar segura de lo que estás haciendo. Con `equals()` no tienes por que preocuparte por ninguno de estos detalles técnicos.
+Usa `equals` en vez de `==` para comparar strings. No importa que uses `interning`; tendrías que remitirte hasta la asignación de la variable o a la llamada explicita de `intern()` para estar segura de lo que estás haciendo. Con `equals()` no tienes por que preocuparte por ninguno de estos detalles técnicos.
 
 [source,java]
 ----
@@ -830,7 +855,7 @@ title1 != null && title1.equals(title2);
 
 ==== Strings en una sola línea
 
-La declaración de un string debe mantenerse en una sola línea independientemente de su longitud. Esto se permite ya que los editores de código modernos dan un solo color fijo a todo el texto, con lo cual, al leer el código, todo el texto es interpretado por la mente como un solo token (fácil de ignorar).
+La declaración de un string debe mantenerse en una sola línea independientemente de su longitud. Esto se permite ya que los editores de código modernos dan un solo color fijo a todo el texto, con lo cual, al leer el código, todo el texto es interpretado por la mente humana como un solo token (fácil de ignorar).
 
 [source,java]
 ----
@@ -1006,11 +1031,11 @@ private static final int TEAL_COLOR = 0x068F8E;
 private static final long MAC_ADDRESS = 0xCA_FE_BA_BE_DE_ADL;
 ----
 
-==== Usa `L`, `D`, `f` en vez de hacer casting
+==== Usa `L`, `D`, `F` en vez de hacer casting
 
 Estos sufijos son un sugar syntax para casting explicitos de valores constantes hacia variables de tipo [primitive class wrapper](https://en.wikipedia.org/wiki/Primitive_wrapper_class_in_Java).
 
-En ocasiones no es posible trabajar directamente con variables primitivas por uso de génericos, así que tenemos que recurrir a estas clases que no aceptan castings inmpicitos desde un int primitivo.
+En ocasiones no es posible trabajar directamente con variables primitivas por uso de génericos, así que tenemos que recurrir a estas clases que no aceptan castings implicitos desde un int primitivo.
 
 [source,java]
 ----
@@ -1031,6 +1056,88 @@ Double sigma = 1_000_000D;
 ----
 
 ==== Usa BigDecimal para evitar perdida de precisión
+
+Los tipos `float` y `double` utilizan representación binaria en coma flotante (IEEE 754). Esto significa que muchos números decimales (como `0.1`) no pueden representarse exactamente, lo que provoca errores de redondeo acumulativos.
+
+[source,java]
+----
+// incorrecto, total es igual a 0.30000000000000004
+double price = 0.1;
+double total = price * 3;
+
+// correcto, total es igual a 0.3
+BigDecimal price = new BigDecimal("0.1");
+BigDecimal total = price.multiply(BigDecimal.valueOf(3));
+----
+
+Nunca uses el constructor `BigDecimal(double)` porque hereda la imprecisión del `double`. Siempre usa el constructor `BigDecimal(String)` o el método
+`BigDecimal.valueOf(double)`.
+
+[source,java]
+----
+// incorrecto, el valor es 0.100000000000000005551...
+BigDecimal price = new BigDecimal(0.1);
+
+// correcto
+BigDecimal price = new BigDecimal("0.1");
+
+// también correcto
+BigDecimal price = BigDecimal.valueOf(0.1);
+----
+
+==== Define una escala y política de redondeo
+
+Las operaciones aritméticas con `BigDecimal` deben especificar siempre la escala y el modo de redondeo. No confíes en el redondeo por defecto, ya que puede lanzar una excepción (`ArithmeticException`) en divisiones no exactas.
+
+[source,java]
+----
+// incorreto, lanza `ArithmeticException` si la división no es exacta
+BigDecimal result = price1.divide(price2);
+
+// correcto
+BigDecimal result = price1.divide(price2, 2, RoundingMode.HALF_EVEN);
+----
+
+El `RoundingMode.HALF_EVEN` (redondeo bancario) es el modo predeterminado en muchos estándares financieros y evita sesgos estadísticos. Es la opción recomendada si no hay requisitos específicos.
+
+==== Utiliza `BigDecimal` como tipo inmutable
+
+`BigDecimal` es inmutable. Cada operación devuelve una nueva instancia en lugar de modificar la existente. Asegúrate de asignar siempre el resultado de las operaciones a una variable.
+
+[source,java]
+----
+// incorrecto, `add` no es mutable
+BigDecimal total = BigDecimal.ZERO;
+total.add(price);
+
+// correcto
+BigDecimal total = BigDecimal.ZERO;
+total = total.add(price);
+----
+
+==== Compara BigDecimal correctamente
+
+No uses `equals()` para comparar `BigDecimal` porque también compara la escala. Usa `compareTo()` que ignora la escala para la comparación de valor numérico.
+
+[source,java]
+----
+BigDecimal a = new BigDecimal("2.0");
+BigDecimal b = new BigDecimal("2.00");
+
+// incorreto, no son iguales
+a.equals(b);
+
+// correcto, solo compara el valor del número
+a.compareTo(b) == 0;
+----
+
+Para comparar con cero, usa `BigDecimal.ZERO.compareTo(valor) == 0` en lugar de `BigDecimal.ZERO.equals(valor)`.
+
+==== Usa `BigDecimal` en valores de retorno de APIs
+
+Cuando tu API devuelve valores monetarios o precisos, utiliza siempre `BigDecimal` en lugar de `double` o `float` para garantizar que el consumidor reciba el valor exacto sin pérdida de precisión.
+
+Aunque `BigDecimal` tiene un coste de rendimiento mayor que `double`, este coste es insignificante para la mayoría de las aplicaciones empresariales comparado con el riesgo de errores de precisión. Para operaciones masivas (estadísticas, big data), considera alternativas como `long` representando fracciones.
 
 === Métodos
 
@@ -1062,7 +1169,7 @@ public Model getById(List<Model> items, int id) {
 }
 ----
 
-Si tu método necesita más líneas de código para cumplir su labor, es síntoma de que "sabe hacer demasiadas cosas" segrega tu código en múltiples métodos con pocas responsabilidades. Recuerda que para endender qué es lo que hace un método es necesario entender cada una de sus partes.
+Si tu método necesita más líneas de código para cumplir su labor, es síntoma de que "sabe hacer demasiadas cosas" segrega tu código en múltiples métodos con pocas responsabilidades. Recuerda que para entender qué es lo que hace un método es necesario entender cada una de sus partes.
 
 [source,java]
 ----
@@ -1214,7 +1321,7 @@ class Task {
   }
 }
 
-task.append(actino);
+task.append(action);
 ----
 
 Modificar los valores de un parámedro, no como la intención principal del método sino como un efecto secundario añade incertidumbre al usuario de la misma sobre su uso.
@@ -1294,7 +1401,7 @@ class PatientsScheduler extends Scheduler implements Serializable, Configurable 
 }
 ----
 
-La iiave de apertura de definición de la clase debe estar en la misma línea de la firma.
+La llave de apertura de definición de la clase debe estar en la misma línea de la firma.
 
 [source,java]
 ----
@@ -1365,7 +1472,7 @@ El orden de los elementos dentro de una clase son de arriba a abajo:
 8.- Métodos de instancia
 9.- Clases anidadas
 
-Cada una de estas secciones va separada con uns línea vacía de separación.
+Cada una de estas secciones va separada con una línea vacía de separación.
 
 A su vez, cada uno de estos apartados debe estar organizado por sus modificadores de acceso (public, default, protected y private) del más permisivo al más restrictivo.
 
@@ -1435,7 +1542,7 @@ class Pattern {
 }
 ----
 
-Ha de notarse que en la sección de constructores tiene más prioridad la complejidad y número de parámetros que el modificador de accesos. En general, la sobrecarga de métodos tiene más relevancia que los modificadores de acceso.
+Ha de notarse que en la sección de constructores tiene más prioridad la complejidad y número de parámetros que el modificador de accesos. En general, la complejidad de las sobrecargas de métodos tiene más relevancia que los modificadores de acceso.
 
 ==== Propiedades
 
@@ -1470,7 +1577,7 @@ Si el valor no va a cambiar desde la compilación, entonces lo que necesitas una
 
 ==== Métodos
 
-todo metodo deberia interactuar leyendo o modificando por lo menos un atributo de la clase, si no lo hace, debes replantearte si dicho metodo pertenece realmente a la clase
+Todo metodo deberia interactuar leyendo o modificando por lo menos un atributo de la clase, si no lo hace, debes replantearte si dicho metodo pertenece realmente a la clase
 
 ==== Una clase por archivo
 
@@ -1520,7 +1627,7 @@ public class SendMailJob implements Job {
 
 package com.example.job.sendmail;
 
-// al no ser public, esta clase no es accesible fuera del paakage
+// al no ser public, esta clase no es accesible fuera del package
 class SendMailAction implements Action {
   public void start() {
     ...
@@ -1548,11 +1655,11 @@ public class Order {
 }
 ----
 
-Por default define tus clases anidadas como estáticas excepto si realmente necesitas acceso a las variables de instancia de la clase huésped. Recuerda que la mayoría de los exploits de códigos son causa de demasiado ofuscados como para anticipar todos los escenarios de uso posibles.
+Por default define tus clases anidadas como estáticas excepto si realmente necesitas acceso a las variables de instancia de la clase huésped. Recuerda que la mayoría de los exploits de códigos son causa de una excesiva ofuscación como para anticipar (o siquiera testear) todos los escenarios de uso posibles.
 
 ==== Clases anónimas
 
-Evita diseñar tus clases con el objetivo de ser implementadas como clases anidadas. También evita implementar clases de terceros como clases anónimas cuando sea posible.
+Evita diseñar tus clases con el objetivo de ser implementadas como clases anónimas. También evita implementar clases de terceros como clases anónimas cuando sea posible.
 
 Esto es preferible ya que la implementación de una clase anónima es demasiado engorrosa, tanto de escribir como de leer.
 
@@ -1564,29 +1671,29 @@ No uses clases locales. Punto.
 
 ==== Métodos estáticos
 
-en general los metodos estaticos son más dificiles de modificar a posterior (recuerda el open close principle)
-los metodos estaticos deben de construirse como funciones
-los metodos estaticos deben de construirse como funciones puras
-no deben de tener acceso a variables estaticas (excepto singleton?)
-son utiles se queieres implementar factories o builders
-no uses metodos estaticos simplemente para no lidiar con OOP
-considera la posibilidad de que si haces tu metodo estatico por no tener relación con las variables de entorno, probablemente el metodo no deberia estar en la clase
+En general los metodos estáticos son más dificiles de modificar a posterior (recuerda el open close principle)
 
-no acedas a metodos estaticos a través de subtipos y en general no combines herencia con methodos estaticos
+Favorece el diseño de tus métodos estáticos como funciones, esto es, que no tengan efectos secundarios y que no muten variables estáticas.
 
-static imports?
+No uses métodos estáticos simplemente para no lidiar con OOP.
+
+No accedas a métodos estáticos a través de subtipos ni los combines con herencia. Los métodos estáticos no son polimorficos.
+
+Utiliza `static imports` cuando lo veas posible para simplificar la lectura de tu código.
 
 ==== Variables estáticas
 
-Las variables estaticas, son dentro de llava variables globales. Evita en la medida de lo posible su uso.
+Las variables estaticas, son dentro de Java variables globales. Evita en la medida de lo posible su uso.
 
 Si tienes una razón de peso para el uso de una variable global, asegurate de que sea privada. Y si necesitas modificarla desde un punto externo a la clase en que estás declarada, hazlo a través de métodos estáticos en la misma clase.
+
+También considera la opción de usar un singleton en su lugar.
 
 ==== Evita el 'God Object'
 
 El "God Object" es un antipatrón muy común en principiantes en el cual una clase tiende a crecer en tamaño y responsabilidades. De forma natural existen dos clases que tienden a degenerar en este antipatrón:
 
-1.- La clase `User`: Si no prestas atención, esta clase puede terminar encargandose de gestionar demasiadas responsabilidades en el sistema (crud de usuarios, login, cambios de contraseña..).
+1.- La clase `User`: Si no prestas atención, esta clase puede terminar encargandose de gestionar demasiadas responsabilidades en el sistema (crud de usuarios, login, cambios de contraseña...).
 
 2.- Aquella clase que sea el centro del dominio de tu proyecto. Si tu aplicación es una app de viajes, entonces la clase con tendencia a degenerar en un "God Object" es la clase `Travel`; si tu app es un kanban, entonces será la clase `Task`.
 
@@ -1603,56 +1710,252 @@ Document document = new Document();
 
 // correcto
 Document document = Document
-    .create()
+    .builder()
     .setPointer(10, 10)
     .setFontSize(18)
     .setText("Reporte de actividades")
-    .setPointer(10, 50);
+    .setPointer(10, 50)
+    .build();
 ----
 
 ==== Factory method
 
-Si tu
+Cuando la creación de una instancia no es trivial (requiere validaciones, valores por defecto, o lógica condicional), o cuando quieres dar un nombre semántico al proceso de creación, utiliza métodos factory en lugar de invocar directamente el constructor.
 
+Estos métodos deben devolver una instancia de la clase y su nombre debe reflejar claramente qué tipo de objeto están creando (ej. `of`, `from`, `valueOf`, `create`, `newInstance`).
 
+[source,java]
+----
+// incorrecto: constructor genérico y sin semántica
+// no queda claro qué tipo de documento se está creando
+Document doc = new Document("informe.pdf", 135, 240, true, false);
 
+// Correcto: factory method con nombre expresivo
+Document doc = Document.createReport("informe.pdf");
+----
 
 === Herencia
 
 ==== La herencia no es para reutilizar código
 
+Cuando defines una nueva entidad en base a otra clase ya existente, esta entidad debe entenderse como un subtipo (`is-a`). Si tu clase no cumple esta relación entonces no deberías usar herencia.
+
+[source,java]
+----
+// incorrecto, un cajero no es una impresora
+class Printer { ... }
+class CashMachine extends Printer { ... }
+
+// correcto, una service account es un subtipo de usuario
+class User { ... }
+class ServiceAccount extends User { ... }
+----
+
+Si la razón por la que quieres implementar herencia es porque necesitas una determinada funcinalidad o caracteristica de la clase base y no quieres duplicar código, entonces debes replantearte si dicha funcionalidad realmente pertenece a la clase base en primer lugar. Modificar las preconcepciones que tenemos sobre qué es y que no es parte de nuestras entidades (refactorizar nuestros diseños) es parte natural del ciclo de vida de desarrollo de todo proyecto.
+
 ==== Composición antes que herencia
 
-Diseña tus clases en base a composición antes que en base a herencia.
+Debes considerar a la herencia como la última opción disponible. Esto debe ser así pues su implementación es algo que solo se puede hacer una vez y su refactorización resulta complicada debido al alto acoplamiento que genera entre la clase base y la clase heredada.
+
+Diseña tus clases en base a composición antes que en base a herencia. La composición ofrece una mayor flexibilidad con menor acoplamiento, e incluso permite un mayor encapsulamiento de responsabilidades.
+
+La composición se basa en mantener instancias de otras clases en vez de heredar el comportamiento completo, de modo que es más fácil limitar el uso de la clase componente y al mismo tiempo es más fácil expandir la funcionalidad de la clase compuesta a través de múltiples componentes para realizar todas sus tareas.
+
+[source,java]
+----
+// incorrecto, `CashMachine` no es una impresora con habilidades extra.
+class CashMachine extends Printer {
+  private void printRecipt() {
+    super.print();
+  }
+}
+
+// correcto, `CashMachine` es una entidad compuesta de muchas entidades.
+class CashMachine {
+  private final Printer printer = new Printer();
+  private final CardAuthenticator authenticator = new CardAuthenticator();
+  private final CurrencyCalculator calculator = new CurrencyCalculator();
+
+  private void printRecipt() {
+    printer.print();
+  }
+}
+----
 
 ==== Interfaces antes que herencia
 
-Usa interfaces para definir supertipos
+Aún si tu entidad responde correctamente a la respuesta "X es un subtipo de Y" eso no necesariamente significa que la herencia sea la mejor opción, justamente por el tema antes mencionado de el alto acoplamiento que habría entre los dos tipos.
+
+Una alternativa a explorar antes, es utilizar el principio de interface segregation para quitar responsabilidades al supertipo Y que quiza no le competen del todo.
+
+[source,java]
+----
+// correcto, una service account es un subtipo de usuario
+class User { ... }
+class ServiceAccount extends User { ... }
+
+private void login(User user) { ... }
+
+// mejor, al no ser por definición "humana", una `ServiceAccount` no necesita hacer todo lo que
+// `User`.
+interface Authenticable { ... }
+interface Authorizable { ... }
+interface Taxeable { ... }
+interface Addressable { ... }
+
+class User implements Authenticable, Authorizable, Taxeable, Addressable {}
+class ServiceAccount implements Authenticable, Authorizable
+
+private void login(Authenticable prospect) { ... }
+----
 
 ==== Evita árboles de jerarquias complejas
+
+Las jerarquías de herencia profundas o extensas son difíciles de entender, modificar y depurar. Cada nivel añade complejidad y aumenta el riesgo de efectos colaterales al modificar la clase base.
+
+Prefiere jerarquías planas con interfaces para comportamientos transversales.
+
+Si encuentras que necesitas muchos niveles, probablemente estés abusando de la herencia y deberías reconsiderar el diseño usando composición e interfaces.
+
 ==== Garantiza Liskov
 
+El principio de Liskov establece que los objetos de una subclase deben poder sustituir a objetos de la superclase sin alterar el comportamiento esperado del programa.
 
+En la práctica, esto significa que la subclase no debe:
+- Reforzar las precondiciones (requisitos de entrada) de los métodos de la superclase.
+- Lanzar excepciones que no sean declaradas o esperadas por la superclase.
+- Cambiar el estado interno de manera que viole las invariantes de la superclase.
 
+Si al crear una subclase te ves obligado a anular muchos métodos y dejar otros sin implementar o lanzando excepciones, es que estás rompiendo el principo y probablemente deberías usar composición o refactorizar tus clases.
 
 === Interfaces
 
 ==== Haz segregación de interfaces
+
+Una interfaz debe ser específica y representar una única responsabilidad o rol. Evita crear `fat interfaces` que obliguen a las clases
+implementadoras a depender de métodos que no necesitan.
+
+Si una interfaz tiene múltiples grupos de métodos que son utilizados por diferentes tipos de clientes, es señal de que debe dividirse en interfaces más pequeñas.
+
+[source,java]
+----
+// incorrecto, Worker tiene demasiadas responsabilidades
+interface Worker {
+  void run();
+  void log();
+  void schedule();
+}
+
+// correcto, es más fácil refactorizar
+interface Worker {
+  void run();
+}
+
+interface Loggable {
+  void log();
+}
+
+interface Schedulable {
+  void schedule();
+}
+
+class Executable implements Worker, Loggable {}
+----
+
+Al segregar interfaces, el código cliente puede depender únicamente de la interfaz que necesita (Principio de Inversión de Dependencias). Esto facilita las pruebas unitarias (mocking) y desacopla los módulos.
+
 ==== Composición antes que herencia múltiple
 
-Diseña en base a comtosición en vez de herencia múltiple (default methods)
+Java permite el polimorfismo a través la implementación de interfaces, sin embargo, desde Java 8, las interfaces pueden tener métodos `default`.
 
-==== Clases abstractas
+Aunque son útiles, abusar de ellos para compartir lógica compleja entre interfaces introduce herencia múltiple.
 
+Por ello, cuando necesites compartir comportamiento o estado entre diferentes implementaciones de interfaces, utiliza composición en lugar de heredar comportamiento a través de métodos `default` complejos
 
 === Paquetes
+
 ==== Limita la interfaz publica
+
+Un paquete debe exponer únicamente aquellos tipos que son necesarios para que otros paquetes interactúen con su funcionalidad. Todo lo que no sea parte de la API pública debe quedar dentro de la interfaz privada del paquete.
+
+Esto reduce el acoplamiento y te permite modificar la implementación interna de forma transparente para los usarios del paquete.
+
+[source,java]
+----
+package com.myapp.scheduler;
+
+// al ser publicos, Scheduler y Activity pueden ser importados fuera del package
+public class Scheduler {}
+public class Activity {}
+
+// al no ser publicos, estas clases son invisibles para el resto del sistema
+class Cron {}
+class interpreter {}
+----
+
 ==== Los cambios de requerimientos no deben propagarse fuera del paquete
+
+Cada paquete debe encapsular sus propias decisiones de diseño. Si un requisito cambia dentro de la responsabilidad de un paquete, el impacto debe limitarse a ese paquete. Los paquetes externos solo dependen de la interfaz pública, y esa interfaz debe ser estable en la medida de lo posible.
+
+Si al modificar un requisito interno te ves obligado a cambiar la API pública de tu paquete, es señal de que la interfaz pública no está bien abstraída. Revisa el diseño para separar lo que cambia de lo que permanece estable.
+
 ==== No deben haber depencencias circulares entre paquetes
+
+Las dependencias circulares (paquete A depende de B, y B depende de A) generan un alto acoplamiento, dificultan la comprensión del sistema y complica la modularización.
+
+Los paquetes idealmente deberían formar un grafo acíclico dirigido (a.k.a. DAG).
+
+Aplica el principio de inversión de dependencias, los paquetes de alto nivel no deben depender de los de bajo nivel sino que ambos deben depender de interfaces intermedias como DTOs o similares.
+
 ==== Segrega clases no relacionadas
+
+Agrupa en un mismo paquete solo aquellas clases que colaboran estrechamente para cumplir una única responsabilidad funcional o dicho de otra forma, tienen una alta cohesión. Si alguna de tus clases tiene responsabilidades más bien tangenciales a dicha responsabilidad, muévela a un paquete aislado.
+
+Una buena forma de evaluar la cohesión de un paquete es preguntarte: "Si otro programador abre este paquete, ¿entenderá inmediatamente su propósito?"
+
+Si la respuesta es no, probablemente necesites replantearte el diseño de esa parte del sistema.
+
 ==== El código que define un patrón/arquitectura no debe estar en el mismo paquete que en le que se implementa
+
+El código que define la estructura de un patrón de diseño o la arquitectura de tu sistema no debe estar en el mismo paquete que las implementaciones concretas de ese patrón.
+
+La abstracción en cuestión es por si misma su propia documentación y por lo tanto la implementación en el mismo paquete supondría un detrimento a dicho propósito.
+
+[source,bash]
+----
+com.myapp.pubsub
+  Publisher.java
+  Subscriber.java
+  Message.java
+  Topic.java
+
+com.myapp.pubsub.kafka
+  KafkaPublisher.java
+  KafkaSubscriber.java
+
+com.myapp.pubsub.mosquitto
+  MosquittoPublisher.java
+  MosquittoSubscriber.java
+----
+
 ==== Documentación
 
+Todo paquete que sea ajeno a la arquitectura principal de tu sistema debe incluir un archivo `package-info.java` que describa su propósito y responsabilidad dentro del sistema. Normalmente dichos paquetes están dentro de `utils` o `lib`.
+
+Los paquetes que ya forman parte de la arquitectura no necesitan de dicho archivo pues la arquitectura es por si misma la documentación.
+
+[source,java]
+----
+/**
+ * Provides interfaces and implementations for formatting domain objects
+ * into different output representations.
+ *
+ * The package contains abstractions for text, JSON, XML and custom
+ * formatting strategies. Implementations should be stateless and thread-safe
+ * whenever possible.
+ */
+package com.myapp.lib.format;
+----
 
 === Convención de nomenclatura
 
@@ -1756,7 +2059,7 @@ class CUSTOMER_FETCHER {}
 class CustomerFetcher {}
 ----
 
-Las clases van en singular al representar una entidad o, lo que es lo mismo, una unidad de significado a nivel del dominio del sistema.
+Las clases van en singular al representar una entidad, o lo que es lo mismo, una unidad de significado a nivel del dominio del sistema.
 
 [source,java]
 ----
@@ -1827,11 +2130,8 @@ class ConnectionMannager {}
 // correcto
 class Connection {}
 
-// incorrecto
+// por desgracia, necesario en springboot
 public class StoreServiceImpl {}
-
-// correcto
-public class StoreService {}
 
 // aceptable
 class DateTimeUtils {}
@@ -1859,7 +2159,7 @@ class ClientData {}
 // correcto
 class Client {}
 
-// también correcto, da contexto de su lugar en la arquitectura del sistema
+// también correcto pues da contexto de su lugar en la arquitectura del sistema
 class ClientDto {}
 ----
 
@@ -1925,6 +2225,51 @@ interface Sorter {
 
 Los métodos se escriben en cammelCase y deben expresar una acción en relación a la clase.
 
+==== Nombres de atributos
+
+Los atributos de una clase van en camelCase.
+
+==== Nombres de propiedades
+
+Las propiedades van en camelCase. Los getters llevan el prefijo `get` y los setters el prefijo `set`.
+
+[source,java]
+----
+// correcto
+class MusicPlayer {
+  private Song currentSong;
+
+  public Song getCurrentSong() {
+    return currentSong;
+  }
+
+  public void setCurrentSong(Song value) {
+    currentSong = value;
+  }
+}
+
+MusicPlayer player = new MusicPlayer();
+player.getCurrentSong();
+----
+
+Existen circuntancias en las que se puede definir un método cuyo único propósito sea modificar un atributo y aún así tenga más sentido a nivel semántico no usar el prefijo `set` pero decir que tal método sigue siendo una propiedad o un setter se convierte en una cuestión de etimología que no afecta al resultado final.
+
+[source,java]
+----
+// correcto
+class MusicPlayer {
+  ...
+  private boolean lowFidelity = false;
+
+  public void withLowFidelity() {
+    lowFidelity = true;
+  }
+}
+
+MusicPlayer player = new MusicPlayer();
+player.withLowFidelity();
+----
+
 ==== Nombres de variables
 
 Las variables van en cammelCase.
@@ -1937,9 +2282,20 @@ Las constantes van en SCREAM_SNAKE_CASE.
 
 Los nombres de los enums van en PascalCase. Los posibles valores del enum van en SCREAM_SNAKE_CASE.
 
-==== Elige nombres que añadan contexdo
+Los nombres de enums no llevan el posfijo `Enum` pues es demasiado redundante.
 
-De igual forma evita nombres carentes de significado.
+[source,java]
+----
+// incorrecto
+public enum DayOfWeekEnum { ... }
+public enum StatusEnum { ... }
+
+// correcto
+public enum DayOfWeek { ... }
+public enum Status { ... }
+----
+
+==== Evita nombres carentes de significado.
 
 [source,java]
 ----
@@ -1949,11 +2305,43 @@ var tmp = count + aux;
 
 ==== Usa el contexto para simplificar el nombre de tu valor
 
-Evita también nombres de solo un caracter.
+[source,java]
+----
+// incorrecto
+public class BoardController {
+  private final BoardService boardService;
+  ...
+}
+
+// correcto, se sobre entiende el tipo de entidades con las que la variable `service` va a trabajar.
+public class BoardController {
+  private final BoardService service;
+  ...
+}
+----
+
+En el caso de implementaciones de lambdas, es posible reducir el nombre de una variable a un solo caracter ya que su significado se obtiene de el contexto.
+
+[source,java]
+----
+// correcto
+List<Clients> clients = findClients();
+var maleClients = clients
+  .stream()
+  .filter(client -> client.sex == Sex.MALE)
+  .collect(Collectors.toList());
+
+// mejor, es intuitivo deducir qué significa la variable `c` en este contexto
+List<Clients> clients = findClients();
+var maleClients = clients
+  .stream()
+  .filter(c -> c.sex == Sex.MALE)
+  .collect(Collectors.toList());
+----
 
 ==== `is`/ `can`/etc para booleanos
 
-Los métodos que retornan un valor booleano y su propósito es solamente retornar dicho valor deben llevar un nombre que exprese una pregunta que en lenguaje humano se conteste son si o no. Usualmente se usan verbos como "is", "can", "has"...
+Los métodos que retornan un valor booleano y su propósito es solamente retornar dicho valor deben llevar un nombre que exprese una pregunta que en lenguaje humano se conteste son si o no. Usualmente se usan verbos como "is", "can", "has", "must", ...
 
 [source,java]
 ----
@@ -1970,106 +2358,681 @@ private boolean isActive() {
 
 ==== No abreviaciones
 
-No uses abreviacioneso
+No uses abreviaciones. Es preferible un nombre largo pero conciso a un nombre corto pero ambiguo.
 
 ==== No sobreexplicar
+
+Un nombre debe ser lo suficientemente descriptivo sin ser excesivamente largo ni repetir información que ya está presente en el contexto.
+
+Elimina palabras superfluas como `data`, `info`, `object`, `helper`, `manager` cuando no añadan valor real.
+
 ==== Evita la notación Hungara
 
+Cada vez más en desuso, la notación Húngara es una convención de nomenclatura que añade prefijos a los nombres para indicar el tipo de dato (`strName`, `intCount`, `cName`, ...). El uso de esta practica se remonta a los años 80 y 90, cuando las bases de datos no contaban con IDEs robustos. En los tiempos que corren, con los IDEs de programación modernos tal necesidad está por demás rebasada por lo que no es necesario continuar con esta práctica. Esto es especialmente inecesario en lengujes de tipado fuerte como Java en los cuales el tipo de una variable ya está garantizado desde la compilación.
 
+[source,java]
+----
+// incorrecto
+String strName;
+int iCount;
+List<Order> lstOrders;
+float fPrice;
 
-
-
+// correcto
+String name;
+int count;
+List<Order> orders;
+double price;
+----
 
 === Excepciones
+
 ==== Separa el código de control de excepciones del código que puede lanzar la excepción
-==== Mensajes claros
-==== Atrapar la excepción más especifica primero
-==== No lanzar `Exception`
-==== No atrapar `Exception`
-==== Si tines dudas deten la ejecución
+
+El bloque `try-catch` debe ser lo más reducido posible, abarcando únicamente el código que puede lanzar la excepción que deseas manejar. Esto mejora la legibilidad y evita capturar excepciones no esperadas en otras partes del bloque.
+
+[source,java]
+----
+// incorrecto, el try-catch abarca demasiado código
+try {
+  String input = readInput();          // puede lanzar IOException
+  int value = Integer.parseInt(input); // puede lanzar NumberFormatException
+  process(value);                      // puede lanzar otra excepción
+} catch (IOException e) {
+  ...
+}
+
+// correcto
+String input;
+try {
+  input = readInput();
+} catch (IOException e) {
+  return;
+}
+
+int value;
+try {
+  value = Integer.parseInt(input);
+} catch (NumberFormatException e) {
+  return;
+}
+
+process(value);
+----
+
+Aislar el código sensible en bloques `try` pequeños facilita la identificación del origen del error y permite un manejo más granular.
+
+==== Los mensajes de las excepciones deben ser claros y descriptivos
+
+El mensaje de una excepción debe proporcionar información suficiente para entender qué salió mal y, si es posible, qué se esperaba. Incluye contexto como valores de entrada, identificadores o estado relevante.
+
+No incluyas información sensible (contraseñas, datos personales, etc.) en los mensajes de error, especialmente en logs que puedan ser expuestos.
+
+[source,java]
+----
+// incorreto, el mensaje es demasiado genérico
+throw new IllegalArgumentException("Invalid value");
+
+// correct
+throw new IllegalArgumentException("El valor '" + input + "' no es un ID válido. Debe ser un número positivo.");
+----
+
+==== Atrapa la excepción más específica primero
+
+Cuando uses múltiples bloques `catch`, coloca las excepciones más específicas antes que las más genéricas.
+
+[source,java]
+----
+try {
+  ...
+} catch (FileNotFoundException e) {
+  ...
+} catch (IOException e) {
+  ...
+} catch (Exception e) {
+  ...
+}
+----
+
+==== No lances `Exception` o `Throwable`
+
+Lanzar excepciones genéricas como `Exception` o `Throwable` obliga a los consumidores a capturar una excepción demasiado amplia, ocultando el tipo real de error y dificultando el manejo específico.
+
+[source,java]
+----
+// incorrecto
+public void process() throws Exception { /* ... */ }
+
+// correcto
+public void process() throws IOException, ValidationException { /* ... */ }
+----
+
+==== No captures `Exception` o `Throwable` sin necesidad
+
+Capturar `Exception` o `Throwable` es una práctica peligrosa porque atrapa todas las excepciones, incluidas las no comprobadas (`RuntimeException` y sus subtipos), y puede ocultar errores graves que deberían propagarse, además de que puedes terminar capturando bugs accidentalmente haciendo difícil su identificación y corrección.
+
+[source,java]
+----
+// incorrecto
+try {
+  ...
+} catch (Exception e) {
+  ...
+}
+
+// correcto
+try {
+  ...
+} catch (IOException | SQLException e) {
+  ...
+}
+----
+
+Capturar `Exception` o `Throwable` solo está permitido en el *main thread* de una aplicación para registrar el error antes de terminar, o en frameworks que requieran un manejador global de excepciones. En cualquier otro caso, es una mala práctica.
+
+==== Si tienes dudas, detén la ejecución
+
+Si no estás seguro de cómo manejar una excepción, o si no hay una acción razonable para recuperarse, no la captures. Deja que la excepción se propague hacia arriba en la pila de llamadas. Esto evita ocultar errores y permite que el sistema falle de forma controlada.
+
+[source,java]
+----
+// incorrecto
+try {
+  ...
+} catch (IOException e) {
+  // No hacer nada o solo loguear y continuar es peligroso
+}
+
+// correcto, propaga la excepción si no se puede manejar adecuadamente
+public void operacionCritica() throws IOException {
+  ...
+}
+----
+
 ==== Define excepciones que representen reglas de negocio
-==== Atrapar Excepciones recuperables
-==== Atrapar Excepciones para relanzarlas con un tipo más especifico
-==== Atrapar Excepciones para guardar un log
-==== Atrapar RuntimeExcepion es aceptable cuando es lanzado por una biblioteca third party
-==== Atrapar RuntimeExcepion es aceptable cuando es un requisito funcinal que la app no se detenga
-==== Si el `catch` no hace nada con la excepción, añade un comentario justificandolo
+
+Crea clases de excepción personalizadas para errores que tengan significado en tu dominio de negocio. Estas excepciones deben reflejar condiciones que son parte de la lógica de la aplicación, no errores técnicos.
+
+[source,java]
+----
+// correcto
+public class InsufficientBalanceException extends Exception {
+  public InsufficientBalanceException(String accountId, BigDecimal required, BigDecimal available) {
+    var message = String.format(
+        "Saldo insuficiente en cuenta %s: se requiere %s, disponible %s",
+        accountId,
+        required,
+        available
+    )
+    super(message);
+  }
+}
+
+public void withdraw(String accountId, BigDecimal amount) throws InsufficientBalanceException {
+  BigDecimal balance = getBalance(accountId);
+  if (balance.compareTo(amount) < 0)
+    throw new InsufficientBalanceException(accountId, amount, balance);
+  ...
+}
+----
+
+==== Atrapa excepciones recuperables
+
+Captura una excepción solo cuando tengas la capacidad de recuperarte del error de manera significativa. Por ejemplo, reintentar una operación, usar un valor por defecto, o mostrar un mensaje al usuario.
+
+[source,java]
+----
+// correcto
+int tries = 3;
+while (tries-- > 0) {
+  try {
+    return remoteCall();
+  } catch (ServiceUnavailableException e) {
+    if (tries == 0) throw e;
+    log.warn("Servicio no disponible, reintentando...");
+    Thread.sleep(1000);
+  }
+}
+----
+
+==== Atrapa excepciones para relanzarlas con un tipo más específico
+
+Cuando captures una excepción técnica y quieras lanzar una excepción de negocio que tenga más sentido para tu dominio, puedes relanzar con un tipo más específico. Siempre que sea posible, encadena la causa original para no perder el stack trace.
+
+[source,java]
+----
+// correcto
+public void pay(PaymentRequest request) throws PaymentFailedException {
+  try {
+    gateway.charge(request);
+  } catch (GatewayException | NetworkException e) {
+    throw new PaymentFailedException("Error al procesar el pago", e);
+  }
+}
+----
+
+==== Atrapa excepciones para guardar un log
+
+Es aceptable capturar una excepción únicamente para guardar un log y luego relanzarla. Asegúrate de incluir el contexto necesario (parámetros, estado) en el log antes de propagar.
+
+[source,java]
+----
+// correcto
+public void analyzeFile(String path) throws IOException {
+  try {
+    File file = new File(path);
+    ...
+  } catch (IOException e) {
+    log.error("Error al procesar el archivo: {}", path, e);
+    throw e;
+  }
+}
+----
+
+==== Capturar `RuntimeException` es aceptable cuando es lanzado por una biblioteca third-party
+
+Algunas bibliotecas de terceros lanzan `RuntimeException` que representan condiciones de error predecibles. En esos casos, es razonable capturar estas excepciones para manejarlas de forma controlada.
+
+[source,java]
+----
+// correcto
+try {
+  JsonObject json = parseJson(input);
+} catch (JsonParseException e) {
+  log.warn("JSON inválido: {}", input, e);
+  return defaultValue;
+}
+----
+
+==== Capturar `RuntimeException` es aceptable cuando es un requisito funcional que la app no se detenga
+
+Si el requisito funcional de la aplicación es que no falle completamente ante errores no críticos, puedes capturar `RuntimeException` en puntos apropiados para garantizar la continuidad del servicio. Por ejemplo, un proceso batch que procesa muchos registros; si uno falla, el resto debe continuar.
+
+[source,java]
+----
+// correcto, si el procesamiento de un record falla, se ignora y la ejecución continua
+for (Record record : records) {
+  try {
+    process(record);
+  } catch (RuntimeException e) {
+    log.error("Error procesando record: {}", record.getId(), e);
+  }
+}
+----
+
+Esta práctica debe usarse con moderación. Capturar `RuntimeException` debe ser una decisión consciente y justificada por requisitos funcionales, no un comodín para evitar fallos.
+
+==== Si el `catch` no hace nada con la excepción, añade un comentario justificándolo
+
+Si por alguna razón decides capturar una excepción y no hacer nada con ella, debes incluir un comentario que explique por qué es seguro hacerlo. Esto evita que otro desarrollador elimine el bloque `catch` por error o introduzca un bug al modificarlo.
+
+[source,java]
+----
+// aceptable, comentario que justifica el catch vacío
+try {
+  connection.close();
+} catch (SQLException e) {
+  // The process is finalizing at this point and we don't want
+  // this error to stop the shutdown
+}
+----
+
+Los bloques `catch` vacíos son sospechosos y deben ser excepcionales. Siempre que sea posible, registra el error o propágalo. Si se decide no hacer nada, la justificación debe ser clara y convincente.
+
+=== `if` y `else`
+
+==== Usa la técnica del early return
+
+Cuando una condición invalida la ejecución de un método, retorna inmediatamente en lugar de envolver todo el código en un bloque `if` anidado. Esto reduce la indentación y hace que el flujo del método sea más lineal y fácil de seguir.
+
+[source,java]
+----
+// incorrecto
+public void process(Order order) {
+  if (order != null) {
+    if (order.isValid()) {
+      ...
+    }
+  }
+}
+
+// correcto
+public void process(Order order) {
+  if (order == null) return;
+  if (!order.isValid()) return;
+  ...
+}
+----
+
+El retorno temprano también se aplica a lanzar excepciones. Si un método recibe parámetros inválidos, lanza la excepción al principio y continúa con la lógica principal sin indentaciones innecesarias.
+
+==== Evita mutaciones o efectos secundarios en la evaluación de condiciones
+
+Las condiciones en un `if` deben ser expresiones booleanas puras que no modifiquen el estado del programa. Evaluar condiciones con efectos secundarios (como incrementos, asignaciones o llamadas que mutan objetos) hace que el código sea difícil de depurar y predecir.
+
+[source,java]
+----
+// incorrecto
+if (++i > 10) { ... }
+
+// incorrecto
+if (list.remove(element)) { ... }
+
+// correcto
+i++;
+if (i > 10) { ... }
+
+// correcto
+boolean removed = list.remove(element);
+if (removed) { ... }
+----
+
+Este principio también se aplica a las condiciones compuestas con operadores `&&` y `||`. Asegúrate de que ninguna de las sub-expresiones tenga efectos secundarios, ya que el `short-circuit evaluation` puede hacer que dichos efectos no se ejecuten siempre, llevando a comportamientos inesperados.
+
+==== No uses llaves cuando el bloque de un `if` contiene solo una línea
+
+Cuando el contenido de un `if` se compone de una sola instrucción las llaves son completamenteopcionales y por lo tanto no deben incluirse ya que es ruido inecesario entorpeciendo la lectura.
+
+[source,java]
+----
+// incorrecto
+if (condition) {
+  doSomething();
+}
+
+// correcto
+if (condition)
+  doSomething();
+
+// mejor
+if (condition) doSomething();
+----
+
+==== Mueve evaluaciones complejas a métodos independientes
+
+Si una condición es larga, contiene múltiples operadores lógicos o requiere varias líneas para ser comprendida, extráela a un método con un nombre descriptivo. Esto mejora la legibilidad y permite reutilizar la lógica.
+
+[source,java]
+----
+// incorrecto
+if (order != null && order.isActive() && order.getTotal().compareTo(BigDecimal.ZERO) > 0
+    && order.getItems().stream().anyMatch(item -> item.getQuantity() > 0)
+    && customer != null && customer.hasValidAddress()) {
+  processOrder(order);
+}
+
+// correcto
+if (isEligibleForProcessing(order, customer))
+  processOrder(order);
+
+private boolean isEligibleForProcessing(Order order, Customer customer) {
+  return order != null
+      && order.isActive()
+      && order.hasPositiveTotal()
+      && order.hasItemsInStock()
+      && customer != null
+      && customer.hasValidAddress();
+}
+----
+
+==== Evita anidaciones profundas de condicionales
+
+Las anidaciones profundas (más de 2 o 3 niveles) hacen que el código sea difícil de leer y mantener.
+
+Como regla general, si necesitas más de 3 niveles de indentación en una estructura condicional, es una señal de que el código necesita ser refactorizado.
+
+==== Usa el operador ternario solo si la expresión es simple
+
+El operador ternario (`condición ? valor1 : valor2`) es útil para asignaciones condicionales simples, pero su uso debe limitarse a expresiones cortas y fáciles de entender. Si la expresión ocupa más de una línea o contiene lógica compleja, usa `if`.
+
+[source,java]
+----
+// incorrecto
+String message = user != null && user.isActive() && user.getRole() != null
+    ? user.getRole().getWelcomeMessage() != null
+        ? user.getRole().getWelcomeMessage()
+        : "Bienvenido, " + user.getName()
+    : "Bienvenido, invitado";
+
+// correcto
+String status = order.isPaid() ? PAID : PENDING;
+----
+
+==== No anides un operador ternario dentro de otro
+
+Anidar operadores ternarios (el llamado "ternario anidado") hace que el código sea extremadamente difícil de leer y propenso a errores de precedencia.
+
+[source,java]
+----
+// incorrecto
+int result = condition1 ? value1 : condition2 ? value2 : condition3 ? value3 : defaultValue;
+
+// correcto
+int result;
+if (condition1) result = value1;
+else if (condition2) result = value2;
+else if (condition3) result = value3;
+else result = defaultValue;
+----
+
+==== Separa el código de control de flujo del código de lógica
+
+Las estructuras condicionales deben encargarse únicamente de decidir qué camino tomar, no de ejecutar lógica compleja. La lógica de negocio debe estar en métodos separados.
+
+[source,java]
+----
+// incorrecto
+if (order.isValid()) {
+  BigDecimal total = BigDecimal.ZERO;
+  for (Item item : order.getItems())
+    total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+  if (total.compareTo(BigDecimal.valueOf(100)) > 0)
+    total = total.multiply(BigDecimal.valueOf(0.9));
+  order.setTotal(total);
+  saveOrder(order);
+  sendConfirmationEmail(order);
+}
+
+// correcto
+public void processOrder(Order order) {
+  if (!order.isValid())
+    throw new IllegalArgumentException("Invalid order");
+  BigDecimal total = calculateTotal(order);
+  BigDecimal totalWithDiscount = applyDiscountIfApplicable(total);
+  order.setTotal(totalWithDiscount);
+  saveOrder(order);
+  sendConfirmationEmail(order);
+}
+
+private BigDecimal calculateTotal(Order order) { ... }
+private BigDecimal applyDiscountIfApplicable(BigDecimal total) { ... }
+private void saveOrder(Order order) { ... }
+private void sendConfirmationEmail(Order order) { ... }
+----
+
+=== Enums
+
+==== Usa enums para representar un conjuntos de opciones
+
+Los `enum` son la elección natural cuando un concepto tiene un número finito y conocido de valores posibles en tiempo de compilación. Usarlos, garantiza desde la compilación que una variable solo podrá aceptar un rango de valores previamente pactado a diferencia de usar tipos primitivos.
+
+[source,java]
+----
+// incorrecto, no es posible controlar qué valor se asigna a nuestra variable
+public static final int STATUS_PENDING = 0;
+public static final int STATUS_PROCESSING = 1;
+
+int status = 200;
+
+// correcto
+public enum OrderStatus {
+  PENDING,
+  PROCESSING,
+  SHIPPED,
+  DELIVERED,
+  CANCELLED
+}
+
+OrderStatus status = OrderStatus.PENDING;
+----
+
+==== Mantén el enum simple
+
+Un `enum` es, idealmente, la representación de un conjunto de valores. Si necesitas añadir múltiples campos, métodos complejos o reglas lógicas, entonces lo que necesitas es una clase.
+
+[source,java]
+----
+// incorrecto, es demasiado complejo
+public enum OrderStatus {
+  PENDING,
+  PROCESSING,
+  SHIPPED,
+  DELIVERED,
+  CANCELLED;
+
+  public boolean canTransitionTo(OrderStatus target) {
+    ...
+  }
+
+  public String getDescription(Locale locale) {
+    ...
+  }
+
+  public void executeAction(Order order) {
+    ...
+  }
+}
+
+// aceptable
+public enum Priority {
+    LOW(1),
+    MEDIUM(2),
+    HIGH(3);
+
+    private final int level;
+
+    Priority(int level) {
+        this.level = level;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+}
+----
+
+==== Usa constantes si lo que te interesa es el valor y no el conjunto
+
+No todos los conjuntos de valores deben ser `enum`. Si lo que necesitas es un valor especifico, o si el conjunto de valores puede cambiar en tiempo de ejecución o extenderse por terceros, usa constantes en una clase.
+
+=== Lambdas
+ ==== Simples y legibles
+ ==== Usa interfaces funcionales estandar (java.util.function)
+ ==== Implementar como función pura
 
 
 
 
-`if` y `else`
- - Usa la técnica del retorno temprano
- - Evita mutaciones o efectos secundarios en la evaluación
- - Usar llaves solo si es necesario
- - Mover evaluaciones complejas a métodos indepentientes
- - Evita anidaciones profundas
- - Usa el operador ternario solo si la expresión es simple
- - No anides un operador ternario dentro de otro
- - Separa el código de control de flujo del código lógico
+
+
+=== Tipos genericos
+ ==== Evita hacer casting
+ ==== Evita usar Object
+ ==== Convención de nombres
+ ==== Restringe el tipo generico a un supertipo pasa tener acceso a su interfaz pública
+ ==== Evita wildcards en los tipos de retorno
+ ==== Usa wildcarda en los parametros de métodos
 
 
 
-
-Enums
- - Usa enums para representar un conjunto de opciones
- - Usa constantes si lo que te interesa es el valor y no el conjunto
- - Manten el enum simple
-
-
-
-Lambdas
- - Simples y legibles
- - Usa interfaces funcionales estandar (java.util.function)
- - Implementar como función pura
-
-
-
-
-
-
-Tipos genericos
- - Evita hacer casting
- - Evita usar Object
- - Convención de nombres
- - Restringe el tipo generico a un supertipo pasa tener acceso a su interfaz pública
- - Evita wildcards en los tipos de retorno
- - Usa wildcarda en los parametros de métodos
-
-
-
-Anotaciones
+=== Anotaciones
 
 Gestión de recursos
  - try-with-resources
 
-Paralelismo
- - Diseña los procesos de forma aislada
- - Evita compartir memoria
- - ...incluso si es de solo lectura
- - Si compartir memoria es inevitable, usa un sistema de semaforos
- - O arquitecturas reactivas
- - O sistemas basados en pub/sub
- - Usa VirtualThreads
+=== Paralelismo
+ ==== Diseña los procesos de forma aislada
+ ==== Evita compartir memoria
+ ==== ...incluso si es de solo lectura
+ ==== Si compartir memoria es inevitable, usa un sistema de semaforos
+ ==== O arquitecturas reactivas
+ ==== O sistemas basados en pub/sub
+ ==== Usa VirtualThreads
 
-Imports
- - No usar wlidcard
- - Menos de 20 imports por archivo
- - Ordanización de imports
- - No incluyas imports para los JDocs
- - Static imports
+=== Imports
 
-Testing
- - Convención de nombres de tests
- - Enfoca a los requerimientos no al coverage
- - Pruebas pequeñas, especificas y deterministas
- - Los test deben permanecer aislados
- - Test Singletons con injección de dependencias
- - Test parametrizados
- - Uns suit de test por clase
- - Usa mocks antes que 'fake classes'
- - Assert solo a lo que estas haciendo test
- - Usa TDD
+==== No uses wildcard imports (`import mypackage.*`)
+
+Los imports con wildcard (`*`) importan todas las clases de un paquete. Aunque pueden parecer convenientes, ocultan las dependencias reales del archivo y pueden provocar conflictos de nombres inesperados. No queda claro qué clases del paquete se están utilizando realmente, si una clase se elimina o renombra, el wildcard sigue siendo válido, dificultando la detección de dependencias rotas.
+
+[source,java]
+----
+// incorrecto
+import java.util.*;
+import java.io.*;
+
+// correcto
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.io.InputStream;
+import java.io.OutputStream;
+----
+
+==== Mantén menos de 20 imports por archivo
+
+Un archivo fuente con demasiados imports es una señal de que la clase tiene demasiadas dependencias y probablemente estas cayendo en el antipatron del `God Object`, o lo que es lo mismo, estas rompiendo el principio single responsability. Considera en su lugar refactorizar la clase en múltiples clases más cohesivas.
+
+[source,java]
+----
+// incorrecto, demasiadas dependencias
+import com.miapp.auth.*;
+import com.miapp.orders.*;
+import com.miapp.customers.*;
+import com.miapp.inventory.*;
+// ... 20 más
+----
+
+Si un archivo supera los 20 imports, revisa su diseño. No se trata de un límite estricto, sino de una señal de alerta para evaluar la cohesión de la clase.
+
+==== Organización de imports
+
+Los imports deben organizarse de forma consistente para que sean fáciles de leer y mantener. El orden es el siguiente:
+
+1.- Imports estándar de Java (java.* y javax.*) en orden alfabético.
+2.- Imports de terceros en orden alfabético.
+3.- Imports de tu propio proyecto en orden alfabético.
+4.- Imports estáticos.
+
+Cada uno de estos apartados va separado por una línea en blanco de separación.
+
+[source,java]
+----
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.miapp.core.Entity;
+import com.miapp.orders.OrderStatus;
+
+import static java.util.stream.Collectors.toList;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+----
+
+==== No incluyas imports para elementos usados solo en los Javadocs
+
+Los enlaces a clases en los Javadocs (`@link`, `@see`, etc.) no necesitan ser importados. Java permite usar nombres completamente cualificados en los Javadocs sin necesidad de declarar un import. Incluir esos imports añade ruido innecesario al archivo.
+
+[source,java]
+----
+// incorrecto
+import com.miapp.orders.OrderService;
+
+/**
+ * Process an order using the class {@link OrderService}.
+ */
+public class OrderProcessor { ... }
+----
+
+==== Uso de imports estáticos (`import static`)
+
+Los imports estáticos permiten acceder a miembros estáticos (métodos o campos) sin calificarlos con el nombre de la clase.
+
+[source,java]
+----
+import static java.lang.Math.PI;
+import static java.util.stream.Collectors.toList;
+
+public class CircleAreaTest {
+  void testArea() {
+    double radius = 5.0;
+    double area = PI * radius * radius;
+    ...
+    List<String> names = getNames()
+        .stream()
+        .filter(n -> n.startsWith("A"))
+        .collect(toList());
+  }
+}
+----
+
+=== Testing
+ ==== Convención de nombres de tests
+ ==== Enfoca a los requerimientos no al coverage
+ ==== Pruebas pequeñas, especificas y deterministas
+ ==== Los test deben permanecer aislados
+ ==== Test Singletons con injección de dependencias
+ ==== Test parametrizados
+ ==== Uns suit de test por clase
+ ==== Usa mocks antes que 'fake classes'
+ ==== Assert solo a lo que estas haciendo test
+ ==== Usa TDD
 
 
 
@@ -2093,8 +3056,6 @@ Usa la sintaxis de JavaDocs para documentar tu código, pues está ofrece una es
 Además esta estructura es usada por la mayoría de los IDEs y editores de código modernos para ofrecer ayuda contextual mientras dichas clases y médodos son útilizados.
 
 Otra caracteritica es que pueden utilizarse otras herramientas para convertir dichos comentarios en documentos (pdf, html, json...).
-
-==== Comentarios en inglés
 
 ==== No "guardar" código como comentario
 
@@ -2181,7 +3142,7 @@ public boolean hasDuplicates(List<Customer> customers) {
 
 ==== HACK
 
-Usa HACK ante un "code smell", es decir, una implementación de código con práctica cuestionables quer debería ser refactorizado.
+Usa HACK ante un "code smell", es decir, una implementación de código con prácticas cuestionables quer debería ser refactorizado.
 
 [source,java]
 ----
@@ -2209,109 +3170,10 @@ La siguiente sección no es necesaria, puedes ignorarla.
 
 Las siguientes recomendaciones son más restrictivas que todo lo antes descrito, y por lo tanto, existe una mayor probabilidad de que encuentres escenarios en tu día a día en los que tenga más sentido ignorarlas.
 
-Sin embargo, te recomiendo probar a trabajar bajo estas restricciones; por lo menos dureante un tiempo. Del hecho de trabajar de una forma tan restrictiva, estarás obligado a pensar "fuera de la caja" para consegir tus objetivos.
+Sin embargo, te recomiendo probar a trabajar bajo estas restricciones; por lo menos durante un tiempo. Del hecho de trabajar de una forma tan restrictiva, estarás obligado a pensar "fuera de la caja" para consegir tus objetivos.
 
 - No más de 100 líneas de código por archivo (contando los imports pero no los comentarios).
 - No más de 12 líneas de código por método (no, no puedes poner más de una instrucción en la misma línea).
 - No más de 15 imports por archivo (no, no puedes usar wildcard imports).
 - No más de 3 niveles de identación por método.
 - No más de 4 parametros por método (si necesitas más argumentos, significa que hay una entidad que no estas definiendo).
-
-
-
-
-
-
-
-
-
-
-
-
-==== Los valores `decimal` no se evaluan con `===` ni `!==`
-
-Los valores de punto flotante acarrean problemas de precisión al ir aplicando operaciones aritmeticas que vuelven a estos operadores inutiles en la práctica.
-
-https://www.embeddeduse.com/2019/08/26/qt-compare-two-floats/
-
-Utiliza una evaluación basada en la constante `Number.EPSILON` para garantizar que dos valores son lo suficientemente cercanos para considerarse iguales.
-
-[source,javascript]
-----
-const areEqual = (a, b) => Math.abs(a - b) < Number.EPSILON
-
-const firstValue = 0.1 + 0.2
-const secondValue = 0.3
-
-// incorrecto, la suma genera perdida de precisión
-if (firstValue === secondValue)
-  console.log('Son iguales')
-
-// correcto, si el error de precisón no es muy grande
-// los valores se consideran iguales
-if (areEqual(firstValue, secondValue))
-  console.log('Son iguales')
-----
-
-
-
-=== Array vs Set vs Map
-=== Objetos (inicialización, usar valor como variable, casos especiales al comienzo, funciones al final, usar . en vez de [])
-
-=== Hungarian notation vs Ducktyping
-=== Estructura de funciones (firma _, throw not implemented, firma desestructurada ({x, y, z}), valores default, no anidar funciones pero una función puede retornar otra función, default params al final)
-=== Función pura (no efectos secundarios, single responsability, inmutable, valor de retorno) (función vs metodo vs procedimiento vs sub rutina)
-=== Monads (para objetos complejos)
-=== Promise vs callback
-
-=== if/else/switch return/throw (unica linea, sin llaves, booleanos simples, elsif vs switch vs if return)
-=== operador ternario (? :) solo para asignaciones. nunca anidar
-=== try/catch solo cuando el error es recuperable
-=== for/while vs Array API vs recursión (forEach vs map vs ser especifico)
-=== Exports (exportar funciones en vez de objetos, el default export debe llamarse igual que el archivo en el que se encuentra, index es la excepción)
-
-
-
-
-// incorrecto
-function quadraticEquation (a, b, c) {
-  return (-b + Math.sqrt(Math.pow(b, 2) - (4 * a * c))) / (2 * a)
-}
-
-
-
-
-Sometimes you’ll realize your first choice of name was inappropriate, but if it isn’t used in a published API then you should strongly consider renaming it even if your development environment doesn’t make it easy.
-
-Nombra las entidades fisicas por lo que son y no por lo que hacer.
-Nombra las entidades logicas por lo que hacen y no por lo que son.
-Usa el contexto para simplificar el nombre de tu valor.
-
-
-public Pattern(String pattern) {
-    wildCard = pattern.equals(WILDCARD_PATTERN);
-    isNumber = pattern.matches(NUMBER_REGEX);
-    if (wildCard) return;
-    final var subpatterns = pattern.split(",");
-    for (var subpattern : subpatterns) {
-      if (subpattern.equals(WILDCARD_PATTERN)) {
-        wildCard = true;
-        break;
-      }
-      if (subpattern.matches(NUMBER_REGEX)) {
-        values.add(Integer.parseInt(subpattern));
-        continue;
-      }
-      if (subpattern.matches(RANGE_REGEX)) {
-        var segments = subpattern.split(RANGE_OPERATOR);
-        var from = Integer.parseInt(segments[0]);
-        var to = Integer.parseInt(segments[1]);
-        for (var i = from; i <= to; i++) values.add(i);
-        continue;
-      }
-      if (subpattern.matches(STEP_REGEX)) {
-        var value = subpattern.replace("*/", "");
-        steps.add(Integer.parseInt(value));
-      }
-    }
-  }
