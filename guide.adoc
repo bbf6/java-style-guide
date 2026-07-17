@@ -3813,9 +3813,24 @@ Todo aquel código que no se ejecute, y en general, que no sea necesario; debe s
 
 Si quieres preservar dicho código porque sospechas que en algún futuro vas a necesitarlo, git ya se encargara de mantener dicho código en su historial de cambios.
 
+==== Comentarios declarativos
+
+Los comentarios, al igual que el código, deben describir qué es lo que el código hace y no cómo lo hace.
+
 ==== Solo comenta la interfaz pública
 
 Ya que el objetivo del comentario es ayudar a otros programadores a entender como usar un fragmento de código, no hace falta dar información sobre su interfaz privada.
+
+[source,java]
+----
+/** Inspects pdfs to validate if they have the right format for the autocompletion */
+public class PdfAnalizer {
+  /** Starts the analyze process once it validates the path is correct */
+  public PdfFile load(String path) { ... }
+
+  private void readFile() { ... } // <--- Al ser privado no hace falta explicar que hace
+}
+----
 
 ==== Explica código de nicho
 
