@@ -2259,8 +2259,8 @@ Los nombres más comunes para tipos genéricos son los siguientes:
 
 - `T` - Type (tipo general)
 - `E` - Element (para elementos de colecciones)
-- `K` - Key (para claves en mapas)
-- `V` - Value (para valores en mapas)
+- `K` - Key (para hashes)
+- `V` - Value (para hashes)
 - `N` - Number (para tipos numéricos)
 - `S`, `U`, `V`, etc - para múltiples parámetros de tipo
 
