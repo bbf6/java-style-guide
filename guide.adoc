@@ -3125,8 +3125,150 @@ public void addIntegers(List<? super Integer> list) {
 
 === Anotaciones
 
-Gestión de recursos
- - try-with-resources
+==== Las anotaciones son metadatos, no lógica de negocio
+
+Las anotaciones deben utilizarse para describir el código, no para implementar comportamiento. La lógica de negocio debe residir en el código de la clase, no en el procesamiento de anotaciones.
+
+==== Usa anotaciones solo cuando añadan valor
+
+No todas las necesidades requieren una anotación personalizada. Si el mismo propósito puede lograrse con una interfaz, un método o una clase base, prefiere esas opciones antes que crear una anotación.
+
+Entre las razones que sensatas para usar anotaciones se destacan:
+
+- Para marcar código para procesamiento en tiempo de compilación (`@Override`).
+- Para proporcionar configuración declarativa (`@Transactional`).
+- Para generar código automáticamente (Lombok).
+- Para restricciones de validación (`@NotNull`, `@Size`, ...).
+
+==== Da valores por default a los atributos de tus anotaciones
+
+Los atributos de una anotación deben tener valores por defecto siempre que sea posible. Esto reduce el boilerplate y permite un uso más limpio de la anotación. Los nombres de los elementos deben ser sustantivos o adjetivos que describan claramente su propósito.
+
+[source,java]
+----
+// incorrecto
+public @interface Audit {
+  String action();
+  String user();
+  boolean sensitive();
+}
+
+@Audit(action = "DELETE", user = "system", sensitive = true)
+public void deleteData() { ... }
+
+// correcto
+public @interface Audit {
+  String action();
+  String user() default "SYSTEM";
+  boolean sensitive() default false;
+}
+
+@Audit(action = "DELETE")
+public void deleteData() { ... }
+----
+
+La convención para el nombre del elemento único es `value()`. Si una anotación tiene un solo elemento, debe llamarse así para permitir la sintaxis abreviada `@Anotacion("valor")` en lugar de `@Anotacion(value = "valor")`.
+
+==== Especifica siempre `@Retention` y `@Target`
+
+Toda anotación personalizada debe declarar explícitamente su política de retención (`RetentionPolicy`) y los elementos a los que puede aplicarse (`ElementType`). Esto documenta claramente el propósito y el ámbito de la anotación.
+
+[source,java]
+----
+// incorrecto, no esta claro el ambito de uso de esta anotación
+public @interface MyAnnotation { ... }
+
+// correcto
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD, ElementType.TYPE })
+public @interface Secured {
+  String[] roles() default {};
+}
+----
+
+https://www.oracle.com/technical-resources/articles/hunter-meta1.html
+
+==== Usa meta-anotaciones para mejorar el diseño
+
+Las meta-anotaciones son anotaciones que se aplican a otras anotaciones. Úsalas para agrupar funcionalidad o para crear anotaciones compuestas que simplifiquen el uso.
+
+[source,java]
+----
+// correcto, solo necesita una anotación
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@Transactional
+@Audit(action = "MODIFY")
+public @interface AuditedTransactional {}
+
+@AuditedTransactional
+public void updateOrder(Order order) { ... }
+----
+
+==== Prefiere anotaciones en tiempo de compilación sobre reflexión
+
+Siempre que sea posible, usa anotaciones con `RetentionPolicy` `CLASS` o `SOURCE` y procesadores de anotaciones en tiempo de compilación. Esto evita el overhead de reflexión en tiempo de ejecución y permite detectar errores en tiempo de compilación.
+
+[source,java]
+----
+// mejor, procesamiento en tiempo de compilación (Lombok)
+@Getter
+@Setter
+@AllArgsConstructor
+public class User {
+  private String name;
+  private String email;
+}
+
+// peor, procesamiento en tiempo de ejecución (reflexión)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Validate {
+  ...
+}
+----
+
+==== Usa anotaciones del JDK para documentar intenciones
+
+Aprovecha las anotaciones estándar del JDK para documentar intenciones y comportamientos:
+
+===== `@Override`
+
+Usa `@Override` para indicar que un método sobrescribe un método de superclase o interfaz.
+
+===== `@Deprecated`
+
+Usa `@Deprecated` para marcar código que no debe usarse y que solo existe para mantener retrocompatibilidad.
+
+===== `@SuppressWarnings`
+
+Usa `@SuppressWarnings` cuando quieras suprimir advertencias del compilador. Debes tener una muy buena razón para usar esta anotación.
+
+===== `@FunctionalInterface`
+
+Usa `@FunctionalInterface` para indicar que una interfaz es funcional, idealmente para implementar como lambdas.
+
+===== `@SafeVarargs`
+
+Usa `@SafeVarargs` para suprimir advertencias sobre operaciones con varargs y tipos genéricos.
+
+==== No uses anotaciones para configuración que cambia frecuentemente
+
+Las anotaciones son estáticas; su valor se define en tiempo de compilación. Si una configuración debe cambiar sin recompilar, usa archivos de propiedades, variables de entorno, bases de datos o algún otro recurso externo.
+
+[source,java]
+----
+// incorrecto, configuración que debería ser dinámica
+@Scheduled(cron = "0 0 9 * * *")
+public void dailyReport() { ... }
+
+// correcto
+@Scheduled(cron = "${report.cron:0 0 9 * * *}")
+public void dailyReport() { ... }
+----
+
+==== Define anotaciones de forma consistente con el estándar de tu proyecto
+
+Si tu proyecto utiliza un framework (Spring, JPA, JUnit), sigue sus convenciones para anotaciones. No reinventes la rueda; usa las anotaciones proporcionadas por el framework antes de crear las tuyas propias.
 
 === Paralelismo
 
@@ -3550,7 +3692,7 @@ void whenOrderIsValid_thenStatusIsProcessed() {
 
 [quote,]
 ----
-Un buen código es como un buen chiste. No necesita que lo expliques.
+Escribir código es como contar un chiste. Si es bueno no necesita que lo expliques.
 ----
 
 No añadas comentarios en tu código e ignora el resto de esta sección.
