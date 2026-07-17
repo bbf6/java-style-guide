@@ -13,7 +13,7 @@ Este documento pretende ser una recopilación de recomendaciones y buenas práct
 
 Este documento tiene una segunda intención: Ayudarte a mejorar la calidad y velocidad de tu trabajo.
 
-Desde los años 90's y hasta la fecha, gente muy obsesionada con la optimización de procesos (managers e ingenieros industriales) han descubierto una y otra vez que los desarrolladores de software pasan el 20% de su tiempo escribiendo código y un 80% leyendolo. Lo interesante es que a lo largo de las últimas 3 decadas y a pesar de que los desarrolladores han cambiado de lenguages, IDEs, metodologías, paradigmas y arquitecturas varias veces; esta proporción se ha mantenido más o menos sin cambios.
+Desde los años 90's y hasta la fecha, gente muy obsesionada con la optimización de procesos (managers e ingenieros industriales) han descubierto una y otra vez que los desarrolladores de software pasan el 20% de su tiempo escribiendo código y un 80% leyendolo. Lo interesante es que a lo largo de las últimas 4 decadas y a pesar de que los desarrolladores han cambiado de lenguages, IDEs, metodologías, paradigmas y arquitecturas varias veces; esta proporción se ha mantenido más o menos sin cambios.
 
 Por esto es más que razonable dedicar un poco de tiempo y atención a escribir código que sea lo más sencillo de leer y comprender posible.
 
@@ -54,7 +54,7 @@ Las palabras reservadas del lenguaje, las APIs nativas y toda biblioteca que hay
 
 Existe una segunda razón. Si en algún momento necesitas colaborar con un desarrollador no hispanohablante, tendrá los mismos problemas que tendrías tú para entender el código de, por ejemplo, un fránces.
 
-Si una variable o clase representa a una fuente de tados como puede ser una base de dados, un archivo scv o el resultado de una llamada a un API REST, y estos valores ya vienen en español o incluso como acronimos o abreviaciones; es justificable (más no obligatorio) el preservar el nombre, en especial si no tenemos control ni responsabilidad sobre dicha fuente de datos.
+Si una variable o clase representa a una fuente de dados como puede ser una base de dados, un archivo scv o el resultado de una llamada a un API REST, y estos valores ya vienen en español o incluso como acronimos o abreviaciones; es justificable (más no obligatorio) el preservar el nombre, en especial si no tenemos control ni responsabilidad sobre dicha fuente de datos.
 
 === Encoding
 
@@ -76,7 +76,7 @@ int total, average = 0;
 
 ==== Uso de `var`
 
-La palabra reservada `var` se usa para definir una variable dentro de un método como alternativa a especificar el tipo de forma explicita. En vez de esto último, `var` delega al compilador la responsabilidad de inferir el tipo a través de el tipo del objeto que se le está asignando.
+La palabra reservada `var` se usa para definir una variable dentro de un método como alternativa a especificar el tipo de forma explícita. En vez de esto último, `var` delega al compilador la responsabilidad de inferir el tipo a través de el tipo del objeto que se le está asignando.
 
 [source,java]
 ----
@@ -93,7 +93,7 @@ long totalTickets = 112; // <-- este es long
 var totalTickets = 112;  // <-- este es int
 ----
 
-`var` puede ayudar a simplificar la lectura de una instrucción de código al minimizar la redundancia de tipos tanto en la referencia como en el objeto a ser asignado. También, indirectamente incentiva al desarrollador ser más correcto al momento de elegir el nombre de sus variables.
+`var` puede ayudar a simplificar la lectura de una instrucción de código al minimizar la redundancia de tipos tanto en la referencia como en el objeto a ser asignado. También, indirectamente incentiva al desarrollador a ser más correcto al momento de elegir el nombre de sus variables.
 
 Los casos de uso ideales para `var` es en la creación de objetos de bibliotecas populares, ya que estas están debidamente documentadas, además de que los tipos devueltos por los mismos son ya esperados y reconocibles por cualquier programador habituado al ecosistema del lenguaje.
 
@@ -101,13 +101,13 @@ Los casos de uso ideales para `var` es en la creación de objetos de bibliotecas
 ----
 // original
 Connection dbConnection = DriverManager.getConnection(DB_URL, USER, PASS);
-Statement statment = dbConnection.createStatment();
-ResultSet result = statment.executeQuery(query);
+Statement statement = dbConnection.createStatment();
+ResultSet result = statement.executeQuery(query);
 
 // mejor, estas clases son tan comunes que resulta inecesario especificarlas
 var dbConnection = DriverManager.getConnection(DB_URL, USER, PASS);
-var statment = dbConnection.createStatment();
-var result = statment.executeQuery(query);
+var statement = dbConnection.createStatement();
+var result = statement.executeQuery(query);
 ----
 
 Debe evitarse el uso de `var` cuando el tipo del objeto sea más especifico de lo que realmente sea necesario, o lo que es lo mismo, es preferible que nuestra referencia sea de un tipo más general que el que tiene el objeto que estamos asignando.
@@ -290,14 +290,13 @@ La programación declarativa se enfoca en describir qué es lo que se quiere obt
 
 El enfoque declarativo hace que el código sea más fácil de leer y modificar, pero no siempre es la opción más eficiente en términos de rendimiento.
 
-Favorece el enfoque declarativo como el estilo default de abordar los problemas y el imperativo cuando el rendimiento de un fragmento de código es más reelevante que su lectura o incluso que su mantenimiento.
+Favorece el enfoque declarativo como el estilo default de abordar los problemas y el imperativo cuando el rendimiento de un fragmento de código sea más reelevante que su lectura o incluso que su mantenimiento.
 
 ==== `Stream` y `foreach` para iterar arrays y colecciónes
 
 Para la mayoría de las iteraciones sobre colecciones, prefiere los métodos del API `Stream` (`map`, `filter`, `reduce`, etc.) y el bucle `for-each`.
 
-Usa `forEach` solo cuando el objetivo sea ejecutar una acción lateral
-(como imprimir o enviar a un log) y no necesites transformar los datos. En cualquier otro caso, prefiere operaciones de `Stream` que devuelvan un resultado.
+Usa `forEach` solo cuando el objetivo sea ejecutar una acción tangencial al stream (como imprimir o enviar a un log) y no necesites transformar los datos. En cualquier otro caso, prefiere operaciones de `Stream` que devuelvan un resultado.
 
 ==== `for` para iteraciones de arrays más complejas
 
@@ -334,19 +333,7 @@ Elimina todos los espacios en blanco a la derecha cuando sean el último caracte
 
 La mayoría de IDEs modernos ya incluyen la opción para eliminar dichos espacios automáticamente al guardar cambios.
 
-[source,java]
-----
-// incorrecto, se han dejado espacios en blanco inecesarios
-public int calcVariance() {
-  ...
-}
-
-private void search() {
-  ...
-}
-----
-
-==== Un solo espacio en blanco
+==== Un solo espacio en blanco de separación
 
 Usa un solo espacio en blanco para separar dos tokens y solo cuando dichos tokens necesiten ser separadaos ya sea por sintaxis o por que alguna de las reglas de esta guía así lo recomienda.
 
@@ -476,7 +463,7 @@ Cuando una línea de código se extiende demasiado en horizontal, es necesario l
 
 [source,java]
 ----
-// Si la firma de la clase ens demasiado extensa, separarla en varias líneas simplifica
+// Si la firma de la clase es demasiado extensa, separarla en varias líneas simplifica
 // la lectura
 public class LazyDeployer
   extends Deployer
@@ -506,7 +493,7 @@ Arrays
 
 Como alternativa, se sugiere que en estos casos la identación ha de ser el doble, de lo normal para evitar confundir la identación por desbordamiento de una línea de código, de la identación por anidación de bloques de código. En el caso de trabajar con 2 espacios, aquí se usarían 4; y en el caso de usar 4, pasaría a 8.
 
-Queda a criterio del desarrllador si es deseable decantarse por esta última opción. Pero recureda mantener la consistencia en todo el proyecto.
+Queda a criterio del desarrllador si es deseable decantarse por esta última opción. Pero recuerda mantener la consistencia en todo el proyecto.
 
 [source,java]
 ----
@@ -519,14 +506,14 @@ List<Customer> customersSorted =
       List<Customer> CustomersMutables = new ArrayList<>(inputCustomers);
       Collections.shuffle(CustomersMutables);
       if (CustomersMutables.size() >= 1)
-        CustomersMutables.get(0).setMarcado(true);
+        CustomersMutables.get(0).setMarked(true);
       if (CustomersMutables.size() >= 2)
-        CustomersMutables.get(1).setMarcado(true);
+        CustomersMutables.get(1).setMarked(true);
       return CustomersMutables;
     })
-    .apply(CustomersIniciales)
+    .apply(InitialCustomers)
     .stream()
-    .sorted(Comparator.comparing(Customer::getNombreCompleto))
+    .sorted(Comparator.comparing(Customer::getFullName))
     .collect(Collectors.toList());
 ----
 
@@ -590,7 +577,7 @@ String[] countries = {
 
 ==== Límite de caracteres por línea
 
-La recomendación de la guía de estilos de Google es limitar la longitud de las líneas a 100 caracteres. Tomaremos esto como el ideal a buscar (soft rule) y 120 caracteres como el límite al que no se debe llegar (hard rule).
+La recomendación de la guía de estilos de https://google.github.io/styleguide/javaguide.html[Google] es limitar la longitud de las líneas a 100 caracteres. Tomaremos esto como el ideal a buscar (soft rule) y 120 caracteres como el límite al que no se debe llegar (hard rule).
 
 La mayoría de editores de código e IDEs incluyen la opción para marcar en pantalla dichos límites.
 
@@ -745,11 +732,57 @@ class UserController {
 
 Para la mente humana, la lectura de un segmento de código no es distinta de la lectura de otro tipo de texto. Al usar un salto de línea para separar un programa en varias partes, estamos intentando organizar el algoritmo subyaciente en secciones e ideas concretas. Si bien el código es más legible, esto solo trata los sintomas pero ignora el problema raíz: Depende de como se vea, el código está rompiendo, bien el principio de "Single responsability" de la programación orientada a objetos, o el principio de "función pura" de la programación funcional.
 
-Dicho de otra forma, estamos intentando segmentar/organizar el código por que la función "sabe hacer demasiadas cosas".
+Dicho de otra forma, estamos intentando segmentar/organizar el código por que el método "sabe hacer demasiadas cosas".
 
-La solución es mover cada sección de código a su propia función. Así ganamos la oportunidad de explicitar (dar nombre) al proceso que estamos computando.
+La solución es mover cada sección de código a su propio método. Así ganamos la oportunidad de explicitar (dar nombre) al proceso que estamos computando.
 
-También es importante señalar que separar en funciones más pequeñas no siempre simplifica el entendimiento del código por si mismo, pues si este mantiene un alto nivel de cohesión con la función principal, entonces las nuevas funciones, por pequeñas que sean, no pueden existir fuera de su conexto. Sin embargo, este es un primer paso en la dirección correcta en la búsqueda de un diseño más correcto.
+También es importante señalar que separar en metodos más pequeños no siempre simplifica el entendimiento del código por si mismo, pues si este mantiene un alto nivel de cohesión con el método principal, entonces los nuevos metodos, por pequeños que sean, no pueden existir fuera de su conexto. Sin embargo, este es un primer paso en la dirección correcta en la búsqueda de un diseño más correcto.
+
+[source,java]
+----
+// incorrecto, el método está separado por secciones porque es demasiado complejo
+public void processOrder(Order order) {
+  if (order == null)
+    throw new IllegalArgumentException("El pedido no existe");
+  if (order.getItems() == null || order.getItems().isEmpty())
+    throw new IllegalArgumentException("El pedido necesita por lo menos un articulo");
+  if (order.getCustomer() == null)
+    throw new IllegalArgumentException("Se necesita un clienete");
+
+  BigDecimal total = BigDecimal.ZERO;
+  for (Item item : order.getItems())
+    total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+  order.setTotal(total);
+
+  if (total.compareTo(BigDecimal.valueOf(1000)) > 0) {
+    BigDecimal discount = total.multiply(BigDecimal.valueOf(0.10));
+    total = total.subtract(discount);
+    order.setTotal(total);
+  }
+
+  orderRepository.save(order);
+
+  emailService.sendConfirmation(
+      order.getCustomer().getEmail(),
+      "Order " + order.getId() + " processed"
+  );
+}
+
+// correcto
+public void processOrder(Order order) {
+  validateOrder(order);
+  calculateTotal(order);
+  applyDiscountIfApplicable(order);
+  saveOrder(order);
+  sendConfirmationEmail(order);
+}
+
+private void validateOrder(Order order) { ... }
+private void calculateTotal(Order order) { ... }
+private void applyDiscountIfApplicable(Order order) { ... }
+private void saveOrder(Order order) { ... }
+private void sendConfirmationEmail(Order order) { ... }
+----
 
 === Booleanos
 
@@ -760,10 +793,10 @@ Es redundante utilizar operadores de comparación para evaluar una expresión bo
 [source,java]
 ----
 // incorrecto, es redundante
-if (user.isActive() == true) return user
+if (user.isActive() == true) return user;
 
 // correcto
-if (user.isActive()) return user
+if (user.isActive()) return user;
 ----
 
 ==== Aislar expresiones complejas en métodos
@@ -809,15 +842,13 @@ Customer customer = new Customer();
 Customer lastCustomer = customer;
 customer == lastCustomer
 
-SignalStatur signal = SignalSatus.WAITING;
+SignalStatus signal = SignalSatus.WAITING;
 signal == SignalSatus.LOADING
 ----
 
 ==== Uso de `equals`
 
-https://medium.com/@alxkm/vs-equals-in-java-whats-the-difference-and-when-to-use-which-727f7f39bce7
-
-Para comparar si dos objetos son "iguales" usa el método `equals`.
+Para comparar si dos objetos son "iguales" usa el método https://medium.com/@alxkm/vs-equals-in-java-whats-the-difference-and-when-to-use-which-727f7f39bce7`[equals]`.
 
 En el caso de tus propias clases, sigue las siguientes recomendasciones sobre la implementación de `equals`:
 
@@ -855,7 +886,7 @@ class Store {
 
 ==== Usa `equals` para evaluar String
 
-Usa `equals` en vez de `==` para comparar strings. No importa que uses `interning`; tendrías que remitirte hasta la asignación de la variable o a la llamada explicita de `intern()` para estar segura de lo que estás haciendo. Con `equals()` no tienes por que preocuparte por ninguno de estos detalles técnicos.
+Usa `equals` en vez de `==` para comparar strings. No importa que uses `interning`; tendrías que remitirte hasta la asignación de la variable o a la llamada explicita de `intern()` para estar seguro de lo que estás haciendo. Con `equals()` no tienes por que preocuparte por ninguno de estos detalles técnicos.
 
 [source,java]
 ----
@@ -903,7 +934,7 @@ public static final String SUCCESS_MESSAGE = "Los datos se han guardado correcta
 
 ==== Strings múltilinea
 
-Usa la sintaxis [text block](https://docs.oracle.com/en/java/javase/26/language/text-blocks.html#GUID-B1AF2D0B-C89F-478B-8C98-E8FC3271DC5E) en aquellos strings cuyo contenido necesite saltos de línea.
+Usa la sintaxis https://docs.oracle.com/en/java/javase/26/language/text-blocks.html#GUID-B1AF2D0B-C89F-478B-8C98-E8FC3271DC5E`[text block]` en aquellos strings cuyo contenido necesite saltos de línea.
 
 [source,java]
 ----
@@ -914,7 +945,7 @@ public static final String QUOTE = """La vida es un sueño y lo sueños, sueños
 public static final String QUERY = "select * "
     + "from schedules as s "
     + "inner join tasks as t "
-    + "on s.it = t.shchedule.id "
+    + "on s.id = t.shchedule.id "
     + "where t.status = true "
     + "and s.date = now()";
 
@@ -922,7 +953,7 @@ public static final String QUERY = "select * "
 public static final String QUERY = "select *\n"
     + "from schedules as s\n"
     + "  inner join tasks as t\n"
-    + "    on s.it = t.shchedule.id\n"
+    + "    on s.id = t.shchedule.id\n"
     + "where t.status = true\n"
     + "  and s.date = now()";
 
@@ -931,7 +962,7 @@ public static final String QUERY = """
     select *
     from schedules as s
       inner join tasks as t
-        on s.it = t.shchedule.id
+        on s.id = t.shchedule.id
     where t.status = true
       and s.date = now();""";
 ----
@@ -944,7 +975,7 @@ En el último ejemplo el output quita todos los espacios en blanco a la izquierd
 select *
 from schedules as s
   inner join tasks as t
-    on s.it = t.shchedule.id
+    on s.id = t.shchedule.id
 where t.status = true
   and s.date = now();
 ----
@@ -983,7 +1014,7 @@ else
 var hotSiteMessage = "¡Advertencia! ¡El site ha alcanzado una temperatura de " + temperature + "! ¡Llama a mantenimiento inmediatamente!";
 ----
 
-Los string son representados en todos los editores de código con un solo color porque tienen la intención de ser considerados como un único token. En el momento en que comienzas a leer el contenido del string pasas de leer un dialecto (java) a leer otro (español, inglés...). Si tu cerebro se encuentra en modo "lectura de texto humano" y se encuentra de repente con un fragmento de código, tendrá que forzosamente volver a cambiar de modo para calcular qué se va a mostrar en el output y luego tendrás que cambiar una vez más de modo para continuar leyendo el string. Usar una variable con un nombre significativo es la diferencia entre encontrate en tu lectura con un semaforo en rojo o solo reducir la velocidad.
+Los string son representados en todos los editores de código con un solo color porque tienen la intención de ser considerados como un único token. En el momento en que comienzas a leer el contenido del string pasas de leer un dialecto (Java) a leer otro (español, inglés...). Si tu cerebro se encuentra en modo "lectura de texto humano" y se encuentra de repente con un fragmento de código, tendrá que forzosamente volver a cambiar de modo para calcular qué se va a mostrar en el output y luego tendrás que cambiar una vez más de modo para continuar leyendo el string. Usar una variable con un nombre significativo es la diferencia entre encontrate en tu lectura con un semaforo en rojo o solo reducir la velocidad.
 
 ==== `String.format()`
 
@@ -1066,7 +1097,7 @@ private static final long MAC_ADDRESS = 0xCA_FE_BA_BE_DE_ADL;
 
 ==== Usa `L`, `D`, `F` en vez de hacer casting
 
-Estos sufijos son un sugar syntax para casting explicitos de valores constantes hacia variables de tipo [primitive class wrapper](https://en.wikipedia.org/wiki/Primitive_wrapper_class_in_Java).
+Estos sufijos son un sugar syntax para casting explicitos de valores constantes hacia variables de tipo https://en.wikipedia.org/wiki/Primitive_wrapper_class_in_Java[primitive class wrapper].
 
 En ocasiones no es posible trabajar directamente con variables primitivas por uso de génericos, así que tenemos que recurrir a estas clases que no aceptan castings implicitos desde un int primitivo.
 
@@ -1090,7 +1121,7 @@ Double sigma = 1_000_000D;
 
 ==== Usa BigDecimal para evitar perdida de precisión
 
-Los tipos `float` y `double` utilizan representación binaria en coma flotante (IEEE 754). Esto significa que muchos números decimales (como `0.1`) no pueden representarse exactamente, lo que provoca errores de redondeo acumulativos.
+Los tipos `float` y `double` utilizan representación binaria en coma flotante (https://en.wikipedia.org/wiki/Primitive_wrapper_class_in_Java[IEEE 754]). Esto significa que muchos números decimales (como `0.1`) no pueden representarse exactamente, lo que provoca errores de redondeo acumulativos.
 
 [source,java]
 ----
@@ -1246,13 +1277,9 @@ public ResponseEntity<?> createRecord(@RequestBody RecordRequest request) {
 }
 
 private boolean isValid(RecordRequest request) { ... }
-
 private boolean save(RecordRequest request) { ... }
-
 private ResponseEntity<?> getInvalidDateResponse() { ... }
-
 private ResponseEntity<?> getSaveErrorResponse() { ... }
-
 private ResponseEntity<?> getSuccessResponse() { ... }
 ----
 
@@ -1298,34 +1325,7 @@ public Receipt createOrder(
 }
 ----
 
-No añadas constantes ni variables de instancia a tu clase solo para cumplir con esta regla. Esto vuelve el uso del método más complicado y la clase completa es más confusa.
-
-[source,java]
-----
-// incorrecto: estas variables de instancia solo se usan dentro del método
-// createOrder() y solo se asignan antes de llamarlo.
-class Order {
-  public void setCustomerId(String value) {
-    ...
-  }
-
-  public void setCustomerName(String value) {
-    ...
-  }
-
-  ...
-
-  public Receipt createOrder() {
-    ...
-  }
-}
-
-Order order = new Order();
-order.setCustomerId("0007660");
-order.setCustomerName("Fernando Pessoa");
-...
-order.createOrder();
-----
+No añadas constantes ni variables de instancia a tu clase solo para cumplir con esta regla. Esto vuelve el uso del método más complicado y la clase completa es más confusa de utilizar.
 
 ==== No mutar parámetros
 
@@ -1402,16 +1402,16 @@ public boolean intersects(List<Device> localDevices, List<Device> remoteDevices)
 }
 ----
 
-==== Define tus métodos como funciones puras
+==== Aplica los principios de la programación funcional
 
-Esto no es siempre deseable, pero en líneas generales definir un método siguiendo buscando acercarse lo más posible a una función pura ayuda simplificar la lectura y añade determinismo a su funcionamiento.
+En realidad no todos los principios de la programación funcional son aplicables a Java, pero hay algunos que pueden ser beneficiosos:
 
-En programación funcional, se define una función pura como quella que:
-
-- Siempre devuelve el mismo output ante el mismo input. O lo que es lo mismo, su cómputo no es afectado por variables externas.
-
-- No tiene efectos secundarios.
-
+- Funciones como ciudadanos de primer nivel: esto se puede lograr hasta cierto punto a través de lambdas.
+- Tus funciones deben ser deterministas: esto también es deseable en métodos.
+- Las funciones no tienen efectos secundarios: no es aplicable a todos los escenarios, pero es algo a tener en cuenta.
+- Las funciones no mutan variables: esta no debería ser aplicable pues en OOP un método por definición, muta (o lee) los atributos de la clase. Por otra parte pueden existir clases cuyo proposito es el ser un repositorio de funciones o también llamadas clases helpers (por ejemplo la clase Math); en esos casos el principo debería respetarse.
+- Las funciones deben ser declarativas: una vez más, nos remitimios al estilo de programación declarativo como ideal a buscar.
+- Recursión para iterar: Java no está tan optimizado en su cola de llamadas, por lo que no es recomendable aplicar recursión en demasiada profundidad.
 
 === Clases
 
