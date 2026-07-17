@@ -2570,7 +2570,7 @@ public void process() throws Exception { /* ... */ }
 public void process() throws IOException, ValidationException { /* ... */ }
 ----
 
-==== No captures `Exception` o `Throwable` sin necesidad
+==== No captures `Exception` o `Throwable`
 
 Capturar `Exception` o `Throwable` es de hecho, peligroso ya que atrapa todas las excepciones, incluidas las no comprobadas (`RuntimeException` y sus subtipos), y puede ocultar errores graves que deberían propagarse, además de que puedes terminar capturando bugs accidentalmente haciendo difícil su identificación y corrección.
 
@@ -2794,7 +2794,7 @@ Este principio también se aplica a las condiciones compuestas con operadores `&
 
 ==== No uses llaves cuando el bloque de un `if` contiene solo una línea
 
-Cuando el contenido de un `if` se compone de una sola instrucción las llaves son completamenteopcionales y por lo tanto no deben incluirse ya que es ruido inecesario entorpeciendo la lectura.
+Cuando el contenido de un `if` se compone de una sola instrucción las llaves son completamente opcionales y por lo tanto no deben incluirse ya que es ruido inecesario entorpeciendo la lectura.
 
 [source,java]
 ----
@@ -2813,7 +2813,7 @@ if (condition) doSomething();
 
 Suelen darse dos argumentos en contra de esta convención:
 
-1.- Es preferible añadir las llaves siempre sin importar cuantas líneas tenga el bloque ya que cuando llegue el momento de refactorizar, no habrá oportunidad para un equivoco si las llaves ya están allí (Es mejor tenerlo y no necesitarlo que necesitarlo y no tenerlo).
+1.- Es preferible añadir las llaves siempre sin importar cuantas líneas tenga el bloque ya que cuando llegue el momento de refactorizar, no habrá oportunidad para un equivoco si las llaves ya están allí (Es mejor tenerlo y no necesitarlo, que necesitarlo y no tenerlo).
 
 2.- Sin las llaves es más dificil leer qué instrucción pertenece o no al bloque, esto es especialmente confuso en situaciones donde hay muchos niveles de scopes en un espacio muy reducido de código.
 
@@ -3230,7 +3230,7 @@ La convención para el nombre del elemento único es `value()`. Si una anotació
 
 ==== Especifica siempre `@Retention` y `@Target`
 
-Toda anotación personalizada debe declarar explícitamente su política de retención (`RetentionPolicy`) y los elementos a los que puede aplicarse (`ElementType`). Esto documenta claramente el propósito y el ámbito de la anotación.
+Toda anotación personalizada debe declarar explícitamente su política de retención (https://www.oracle.com/technical-resources/articles/hunter-meta1.html`[RetentionPolicy]`) y los elementos a los que puede aplicarse (`ElementType`). Esto documenta claramente el propósito y el ámbito de la anotación.
 
 [source,java]
 ----
@@ -3244,8 +3244,6 @@ public @interface Secured {
   String[] roles() default {};
 }
 ----
-
-https://www.oracle.com/technical-resources/articles/hunter-meta1.html
 
 ==== Usa meta-anotaciones para mejorar el diseño
 
@@ -3317,11 +3315,11 @@ Las anotaciones son estáticas; su valor se define en tiempo de compilación. Si
 [source,java]
 ----
 // incorrecto, configuración que debería ser dinámica
-@Scheduled(cron = "0 0 9 * * *")
+@Scheduled(cron = "0 9 * * *")
 public void dailyReport() { ... }
 
 // correcto
-@Scheduled(cron = "${report.cron:0 0 9 * * *}")
+@Scheduled(cron = "${report.cron:0 9 * * *}")
 public void dailyReport() { ... }
 ----
 
@@ -3426,19 +3424,6 @@ public void increment() {
 
 Las arquitecturas reactivas (como Project Reactor, RxJava) tratan los flujos de datos asíncronos como streams. Esto promueve la inmutabilidad y evita el estado compartido al pasar datos a través de canales.
 
-[source,java]
-----
-// correcto
-Flux<Order> orders = Flux.fromIterable(getOrders());
-Flux<Report> reports = orders
-    .parallel()
-    .runOn(Schedulers.parallel())
-    .map(order -> processOrder(order))
-    .sequential();
-
-reports.subscribe(report -> saveReport(report));
-----
-
 ==== ...o sistemas basados en pub/sub
 
 Las arquitecturas `pub/sub` desacoplan productores y consumidores. Cada mensaje se procesa de forma independiente, y los componentes no comparten estado, comunicándose únicamente a través de mensajes.
@@ -3507,10 +3492,10 @@ Un archivo fuente con demasiados imports es una señal de que la clase tiene dem
 [source,java]
 ----
 // incorrecto, demasiadas dependencias
-import com.miapp.auth.*;
-import com.miapp.orders.*;
-import com.miapp.customers.*;
-import com.miapp.inventory.*;
+import com.example.auth.*;
+import com.example.orders.*;
+import com.example.customers.*;
+import com.example.inventory.*;
 // ... 20 más
 ----
 
@@ -3521,8 +3506,11 @@ Si un archivo supera los 20 imports, es síntoma de que debes replantearte el di
 Los imports deben organizarse de forma consistente para que sean fáciles de leer y mantener. El orden es el siguiente:
 
 1.- Imports estándar de Java (java.* y javax.*) en orden alfabético.
+
 2.- Imports de terceros en orden alfabético.
+
 3.- Imports de tu propio proyecto en orden alfabético.
+
 4.- Imports estáticos.
 
 Cada uno de estos apartados va separado por una línea en blanco de separación.
@@ -3539,8 +3527,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.miapp.core.Entity;
-import com.miapp.orders.OrderStatus;
+import com.example.core.Entity;
+import com.example.orders.OrderStatus;
 
 import static java.util.stream.Collectors.toList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -3553,7 +3541,7 @@ Los enlaces a clases en los Javadocs (`@link`, `@see`, etc.) no necesitan ser im
 [source,java]
 ----
 // incorrecto
-import com.miapp.orders.OrderService;
+import com.example.orders.OrderService;
 
 /**
  * Process an order using the class {@link OrderService}.
@@ -3561,7 +3549,7 @@ import com.miapp.orders.OrderService;
 public class OrderProcessor { ... }
 ----
 
-==== Uso de imports estáticos (`import static`)
+==== Uso de imports estáticos
 
 Los imports estáticos permiten acceder a miembros estáticos (métodos o campos) sin calificarlos con el nombre de la clase.
 
@@ -3759,6 +3747,57 @@ No añadas comentarios en tu código e ignora el resto de esta sección.
 ==== Refactoriza en vez de comentar
 
 Si sientes que tu código es demasiado complejo como para ser entendido por otros programadores (por ejemplo, tú mismo dentro de 2 semanas), es natural querer tener la cortesía de documentar la intención de dicho código. Sin embargo, te recomiendo que antes de hacerlo te detengas por un momento para replantearte si es posible reducir la complejidad de tú código.
+
+[source,java]
+----
+// incorrecto, el método es tan complejo que hace falta comentar cada línea
+public void processOrder(Order order) {
+  // 1.- Validations
+  if (order == null)
+    throw new IllegalArgumentException("El pedido no existe");
+  if (order.getItems() == null || order.getItems().isEmpty())
+    throw new IllegalArgumentException("El pedido necesita por lo menos un articulo");
+  if (order.getCustomer() == null)
+    throw new IllegalArgumentException("Se necesita un clienete");
+
+  // 2.- Calc of the total
+  BigDecimal total = BigDecimal.ZERO;
+  for (Item item : order.getItems())
+    total = total.add(item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
+  order.setTotal(total);
+
+  // 3.- Apply the discount if is a big quantity
+  if (total.compareTo(BigDecimal.valueOf(1000)) > 0) {
+    BigDecimal discount = total.multiply(BigDecimal.valueOf(0.10));
+    total = total.subtract(discount);
+    order.setTotal(total);
+  }
+
+  // 4.- Saving in the database
+  orderRepository.save(order);
+
+  // 5.- Sending an email notification
+  emailService.sendConfirmation(
+      order.getCustomer().getEmail(),
+      "Order " + order.getId() + " processed"
+  );
+}
+
+// correcto, el código es su propia documentación
+public void processOrder(Order order) {
+  validateOrder(order);
+  calculateTotal(order);
+  applyDiscountIfApplicable(order);
+  saveOrder(order);
+  sendConfirmationEmail(order);
+}
+
+private void validateOrder(Order order) { ... }
+private void calculateTotal(Order order) { ... }
+private void applyDiscountIfApplicable(Order order) { ... }
+private void saveOrder(Order order) { ... }
+private void sendConfirmationEmail(Order order) { ... }
+----
 
 ==== Usa JavaDocs
 
