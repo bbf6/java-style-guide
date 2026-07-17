@@ -328,6 +328,39 @@ En constructores y setters, es habitual usar `this` para diferenciar parámetros
 
 === Espacios en blanco
 
+==== Espacios a la derecha
+
+Elimina todos los espacios en blanco a la derecha cuando sean el último caracter de la línea.
+
+La mayoría de IDEs modernos ya incluyen la opción para eliminar dichos espacios automáticamente al guardar cambios.
+
+[source,java]
+----
+// incorrecto, se han dejado espacios en blanco inecesarios
+public int calcVariance() {
+  ...
+}
+
+private void search() {
+  ...
+}
+----
+
+==== Un solo espacio en blanco
+
+Usa un solo espacio en blanco para separar dos tokens y solo cuando dichos tokens necesiten ser separadaos ya sea por sintaxis o por que alguna de las reglas de esta guía así lo recomienda.
+
+Solo se permiten dos o más espacios en blanco consecutivos para indicar identación.
+
+[source,java]
+----
+// incorrecto
+if  (age  == 18) canAccess(  );
+
+// correcto
+if (age == 18) canAccess();
+----
+
 ==== Separación entre tokens
 
 Con excepción de `this`, `super`, `return`, `continue` y `break`; todas las palabras reservadas del lenguaje llevan un espacio de separación a su derecha siempre y cuando no sean el último token de la línea:
@@ -2130,9 +2163,6 @@ class ConnectionMannager {}
 // correcto
 class Connection {}
 
-// por desgracia, necesario en springboot
-public class StoreServiceImpl {}
-
 // aceptable
 class DateTimeUtils {}
 
@@ -2219,6 +2249,32 @@ En el caso de interfaces funcionales, nombralas por el rol que cumplen, dentro s
 interface Sorter {
   void sort(List<?> items);
 }
+----
+
+==== Nombres de tipos genéricos
+
+Utiliza nombres cortos y significativos para los parámetros de tipo dentro de una clase genérica. En general se recomienda utilizar una sola letra en mayúscula para representar al tipo, pero si necesitas darle un significado más conciso a nivel de dominio también puedes hacerlo.
+
+Los nombres más comunes para tipos genéricos son los siguientes:
+
+- `T` - Type (tipo general)
+- `E` - Element (para elementos de colecciones)
+- `K` - Key (para claves en mapas)
+- `V` - Value (para valores en mapas)
+- `N` - Number (para tipos numéricos)
+- `S`, `U`, `V`, etc - para múltiples parámetros de tipo
+
+[source,java]
+----
+// correcto
+public interface List<E> { ... }
+public interface Map<K, V> { ... }
+
+// correcto
+public class Response<T> { ... }
+
+// también correcto
+public class Response<Dto> { ... }
 ----
 
 ==== Nombres de métodos
@@ -2469,7 +2525,7 @@ public void process() throws IOException, ValidationException { /* ... */ }
 
 ==== No captures `Exception` o `Throwable` sin necesidad
 
-Capturar `Exception` o `Throwable` es una práctica peligrosa porque atrapa todas las excepciones, incluidas las no comprobadas (`RuntimeException` y sus subtipos), y puede ocultar errores graves que deberían propagarse, además de que puedes terminar capturando bugs accidentalmente haciendo difícil su identificación y corrección.
+Capturar `Exception` o `Throwable` es de hecho, peligroso ya que atrapa todas las excepciones, incluidas las no comprobadas (`RuntimeException` y sus subtipos), y puede ocultar errores graves que deberían propagarse, además de que puedes terminar capturando bugs accidentalmente haciendo difícil su identificación y corrección.
 
 [source,java]
 ----
@@ -2488,7 +2544,7 @@ try {
 }
 ----
 
-Capturar `Exception` o `Throwable` solo está permitido en el *main thread* de una aplicación para registrar el error antes de terminar, o en frameworks que requieran un manejador global de excepciones. En cualquier otro caso, es una mala práctica.
+Capturar `Exception` o `Throwable` solo está permitido en el `main thread` de una aplicación para registrar el error antes de terminar, o en frameworks que requieran un manejador global de excepciones. En cualquier otro caso, es una mala práctica.
 
 ==== Si tienes dudas, detén la ejecución
 
@@ -2637,7 +2693,7 @@ try {
 }
 ----
 
-Los bloques `catch` vacíos son sospechosos y deben ser excepcionales. Siempre que sea posible, registra el error o propágalo. Si se decide no hacer nada, la justificación debe ser clara y convincente.
+Los bloques `catch` vacíos son `code smells`, siempre que sea posible, registra el error o propágalo. Si se decide no hacer nada, la justificación debe ser clara y convincente, y sobre todo evita que la excepción se convierta en regla.
 
 === `if` y `else`
 
@@ -2886,24 +2942,186 @@ public enum Priority {
 No todos los conjuntos de valores deben ser `enum`. Si lo que necesitas es un valor especifico, o si el conjunto de valores puede cambiar en tiempo de ejecución o extenderse por terceros, usa constantes en una clase.
 
 === Lambdas
- ==== Simples y legibles
- ==== Usa interfaces funcionales estandar (java.util.function)
- ==== Implementar como función pura
 
+==== Simples y legibles
 
+Un lambda debe ser corto y expresar claramente su intención en una sola línea si es posible. Si la lógica ocupa más de 3-4 líneas o requiere múltiples instrucciones, considera extraerla a un método con nombre.
 
+[source,java]
+----
+// incorrecto, el lambda es demasiado complicado
+list.stream()
+    .filter(item -> {
+      if (item.getPrice().compareTo(BigDecimal.ZERO) < 0)
+        return false;
+      if (item.getQuantity() < 1)
+        return false;
+      return item.isAvailable();
+    })
+    .forEach(item -> {
+      BigDecimal discounted = item.getPrice().multiply(BigDecimal.valueOf(0.9));
+      item.setPrice(discounted);
+      System.out.println("Updated: " + item.getName());
+    });
 
+// correcto
+list.stream()
+    .filter(this::isValidItem)
+    .forEach(this::applyDiscountAndPrint);
 
+private boolean isValidItem(Item item) {
+  return item.getPrice().compareTo(BigDecimal.ZERO) >= 0
+      && item.getQuantity() >= 1
+      && item.isAvailable();
+}
 
-=== Tipos genericos
- ==== Evita hacer casting
- ==== Evita usar Object
- ==== Convención de nombres
- ==== Restringe el tipo generico a un supertipo pasa tener acceso a su interfaz pública
- ==== Evita wildcards en los tipos de retorno
- ==== Usa wildcarda en los parametros de métodos
+private void applyDiscountAndPrint(Item item) {
+  BigDecimal discounted = item.getPrice().multiply(BigDecimal.valueOf(0.9));
+  item.setPrice(discounted);
+  System.out.println("Updated: " + item.getName());
+}
+----
 
+Un lambda debe poder leerse como una expresión que describe qué se está haciendo, sin tener que explicar cómo se hace internamente. Si necesitas añadir comentarios en tu lambda, es señal de que deberías extraerlo a un método.
 
+==== Usa interfaces funcionales estándar
+
+Java ya viene con el paquete de interfaces funcionales `java.util.function` que cubre la mayoría de los problemas con los que te puedas encontrar: `Function`, `Predicate`, `Consumer`, `Supplier`, `UnaryOperator`, `BinaryOperator`, ...
+
+Úsalas en lugar de crear tus propias interfaces funcionales a menos que necesites un nombre semántico específico.
+
+[source,java]
+----
+// incorrecto, está reinventando la rueda
+@FunctionalInterface
+interface StringTransformer {
+  String transform(String input);
+}
+
+public void process(List<String> list, StringTransformer transformer) { ... }
+
+// correcto
+public void process(List<String> list, UnaryOperator<String> transformer) { ... }
+
+process(names, s -> s.toUpperCase());
+----
+
+El uso de las interfaces funcionales estándar hace que tu API sea más familiar para otros desarrolladores y permite la composición con métodos como `andThen`, `compose`, `or`, `and` u otros.
+
+Si necesitas un nombre más semántico o con significado a nivel del dominio del sistema, puedes crear una interfaz que extienda de `Function` o `UnaryOperator`.
+
+==== Implementa lambdas como funciones puras siempre que sea posible
+
+Una función pura es aquella que no tiene efectos secundarios y cuyo resultado depende únicamente de sus argumentos. Tus lambdas deben ser, en la medida de lo posible, funciones puras.
+
+[source,java]
+----
+// incorrecto
+List<String> names = new ArrayList<>();
+Stream.of("Pessoa", "Martí", "Neruda")
+    .forEach(name -> {
+      names.add(name.toUpperCase());
+      System.out.println("Processing: " + name);
+    });
+
+// correcto
+List<String> upperNames = Stream.of("Pessoa", "Martí", "Neruda")
+    .map(String::toUpperCase)
+    .collect(Collectors.toList());
+upperNames.forEach(System.out::println);
+----
+
+En ejecuciones en paralelo con `parallelStream()`, los lambdas con mutaciones pueden causar condiciones de carrera y resultados inconsistentes. Siempre prefiere funciones puras cuando uses streams paralelos.
+
+Dicho todo esto, es aceptable que un lambda cuando se usa como `forEach` o `peek`. Sin embargo, incluso en esos casos, es preferible separar la lógica de efectos secundarios del resto de la pipeline.
+
+=== Tipos Genéricos
+
+==== Evita hacer casting
+
+Un uso correcto de los genéricos debería eliminar por completo la necesidad de realizar casting en el código. Si te encuentras haciendo casting, es una señal de que estás perdiendo información de tipo o que estás usando tipos raw.
+
+[source,java]
+----
+// incorrecto
+List list = new ArrayList();
+list.add("hola");
+String s = (String) list.get(0);
+
+// correcto
+List<String> list = new ArrayList<>();
+list.add("hola");
+String s = list.get(0);
+----
+
+==== Evita usar `Object` como tipo genérico
+
+La clase `Object` no pretende ser una alternativa válida a la implementación de genericos y por lo tanto no debe usarse como comodín para almacenar libremente cualquier valor.
+
+==== Restringe el tipo genérico a un supertipo para acceder a su interfaz pública
+
+Cuando necesites invocar métodos específicos de un tipo, debes restringir el parámetro genérico mediante un `bounded type parameter`.
+
+[source,java]
+----
+// incorrecto, no sabemos si `T` tiene el método `compareTo()`
+public static <T> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+
+// correcto
+public static <T extends Comparable<T>> T max(T a, T b) {
+  return a.compareTo(b) > 0 ? a : b;
+}
+----
+
+==== Evita usar `wildcards` en los tipos de retorno
+
+Los `wildcards` (`?`, `? extends`, `? super`) en los tipos de retorno obligan a los usuarios de la clase a trabajar con tipos desconocidos, tal y como pasaba con el caso de usar `Object`.
+
+[source,java]
+----
+// incorrecto
+public List<?> getNumbers() { ... }
+
+// incorrecto
+public List<? extends Number> getNumbers() { ... }
+
+// correcto
+public List<Number> getNumbers() { ... }
+
+// correcto
+class Evaluator<T> {
+  public List<T> getElements(T type) { ... }
+}
+
+// correcto
+class Evaluator<T> {
+  public <U> List<U> getElements(Class<U> type) { ... }
+}
+----
+
+==== Usa `wildcards` en los parámetros de métodos
+
+Cuando un método solo lee o crea elementos de una estructura genérica, utiliza `wildcards` para aceptar subtipos o supertipos según corresponda.
+
+[source,java]
+----
+// incorrecto, solo acepta List<Integer>, no List<Number>
+public void addIntegers(List<Integer> list) {
+  ...
+}
+
+// correcto
+public double sum(List<? extends Number> numbers) {
+  ...
+}
+
+// correcto
+public void addIntegers(List<? super Integer> list) {
+  ...
+}
+----
 
 === Anotaciones
 
@@ -2911,19 +3129,161 @@ Gestión de recursos
  - try-with-resources
 
 === Paralelismo
- ==== Diseña los procesos de forma aislada
- ==== Evita compartir memoria
- ==== ...incluso si es de solo lectura
- ==== Si compartir memoria es inevitable, usa un sistema de semaforos
- ==== O arquitecturas reactivas
- ==== O sistemas basados en pub/sub
- ==== Usa VirtualThreads
+
+==== Diseña los procesos de forma aislada
+
+Cada tarea que se ejecuta en paralelo debe ser independiente de las demás en cuanto a su lógica y datos. El objetivo es que no haya dependencias entre tareas que puedan causar colisiones o sincronización.
+
+[source,java]
+----
+// correcto
+List<Order> orders = getOrders();
+
+List<CompletableFuture<Report>> futures = orders.stream()
+    .map(order -> CompletableFuture.supplyAsync(() -> processOrder(order)))
+    .collect(Collectors.toList());
+
+List<Report> reports = futures.stream()
+    .map(CompletableFuture::join)
+    .collect(Collectors.toList());
+----
+
+Si una tarea necesita el resultado de otra para continuar, entonces no son tareas independientes. En ese caso, el paralelismo no es apropiado, o debes diseñar un flujo de trabajo con dependencias explícitas.
+
+==== Evita compartir memoria
+
+El estado compartido (variables mutables accesibles desde múltiples hilos) dispara la complejidad del trabajo con multihilos. Siempre que sea posible, cada tarea debe trabajar con sus propios datos locales, sin acceder a variables compartidas.
+
+[source,java]
+----
+// incorrecto, increment no es un método `thread safe`
+private int counter = 0;
+
+public void increment() {
+  counter++;
+}
+
+// correcto, cada hilo tiene su propia variable
+public int process(Order order) {
+  int localCounter = 0;
+  ...
+  return localCounter;
+}
+----
+
+==== ...incluso si es de solo lectura
+
+Aunque una variable compartida sea de solo lectura, compartir memoria implica que todos los hilos acceden a la misma ubicación de memoria. Esto puede causar problemas de `cache coherence` y afectar al rendimiento. Además, si el hilo principal o un proceso externo muta el valor, el riesgo aumenta. De ser posible usa copias o datos inmutables en cada hilo.
+
+[source,java]
+----
+// correcto
+public class ProcessTask implements Runnable {
+  private final ImmutableData data;
+
+  public ProcessTask(ImmutableData data) {
+    this.data = data;
+  }
+
+  @Override
+  public void run() {
+    ...
+  }
+}
+----
+
+==== Si compartir memoria es inevitable, usa un sistema de semáforos
+
+Cuando no puedas evitar el estado compartido, utiliza mecanismos de sincronización adecuados: `synchronized`, `Lock`, `Semaphore` o estructuras concurrentes como `ConcurrentHashMap`.
+
+Las estructuras del paquete `java.util.concurrent` están optimizadas para entornos de alta concurrencia. Siempre que sea posible, usa `ConcurrentHashMap`, `ConcurrentLinkedQueue`, `Atomic*`, etc., en lugar de sincronizar manualmente.
+
+[source,java]
+----
+// correcto, usa un `Lock` para proteger el estado compartido
+private final Lock lock = new ReentrantLock();
+private int sharedCounter = 0;
+
+public void increment() {
+  lock.lock();
+  try {
+    sharedCounter++;
+  } finally {
+    lock.unlock();
+  }
+}
+
+// correcto, usa `AtomicInteger` (sin bloqueo)
+private final AtomicInteger atomicCounter = new AtomicInteger(0);
+
+public void increment() {
+  atomicCounter.incrementAndGet();
+}
+----
+
+==== ...o arquitecturas reactivas
+
+Las arquitecturas reactivas (como Project Reactor, RxJava) tratan los flujos de datos asíncronos como streams. Esto promueve la inmutabilidad y evita el estado compartido al pasar datos a través de canales.
+
+[source,java]
+----
+// correcto
+Flux<Order> orders = Flux.fromIterable(getOrders());
+Flux<Report> reports = orders
+    .parallel()
+    .runOn(Schedulers.parallel())
+    .map(order -> processOrder(order))
+    .sequential();
+
+reports.subscribe(report -> saveReport(report));
+----
+
+==== ...o sistemas basados en pub/sub
+
+Las arquitecturas `pub/sub` desacoplan productores y consumidores. Cada mensaje se procesa de forma independiente, y los componentes no comparten estado, comunicándose únicamente a través de mensajes.
+
+[source,java]
+----
+// correcto
+public class OrderPublisher {
+  private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+  private final List<Consumer<Order>> subscribers = new CopyOnWriteArrayList<>();
+
+  public void publish(Order order) {
+    for (var subscriber : subscribers)
+      executor.submit(() -> subscriber.accept(order));
+  }
+}
+----
+
+==== Usa `VirtualThreads`
+
+Los `virtual threads` permiten crear millones de hilos ligeros sin el overhead de los hilos del sistema operativo. Esto hace que el código concurrente sea más sencillo de escribir y escalable. Usa `Executors.newVirtualThreadPerTaskExecutor()` para crear un executor que lance un nuevo VirtualThread por cada tarea.
+
+[source,java]
+----
+// correcto
+try (var executor = Executors.newVirtualThreadPerTaskExecutor()) {
+  List<CompletableFuture<Report>> futures = orders
+      .stream()
+      .map(order -> CompletableFuture.supplyAsync(
+          () -> processOrder(order), executor))
+      .collect(Collectors.toList());
+
+  List<Report> reports = futures
+      .stream()
+      .map(CompletableFuture::join)
+      .collect(Collectors.toList());
+}
+----
+
+Ten en cuenta que los `virtual threads` trabajan internamente con los `Threads` clásicos de Java, por lo que no son ni un sustituto ni una optimización. Concretamente los casos de uso donde se pueden destacar es cuando necesitas manejar de forma concurrente muchas tareas aisladas, de cortos ciclos de vida y con tiempos de espera prolongados.
 
 === Imports
 
-==== No uses wildcard imports (`import mypackage.*`)
+==== No uses wildcard imports
 
-Los imports con wildcard (`*`) importan todas las clases de un paquete. Aunque pueden parecer convenientes, ocultan las dependencias reales del archivo y pueden provocar conflictos de nombres inesperados. No queda claro qué clases del paquete se están utilizando realmente, si una clase se elimina o renombra, el wildcard sigue siendo válido, dificultando la detección de dependencias rotas.
+Los imports con wildcard (`*`) importan todas las clases de un paquete ya que ocultan las dependencias reales del archivo y pueden provocar conflictos de nombres inesperados. Tampoco queda claro qué clases del paquete se están utilizando realmente, si una clase se elimina o renombra, el wildcard sigue siendo válido, dificultando la detección de dependencias rotas.
 
 [source,java]
 ----
@@ -2939,7 +3299,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 ----
 
-==== Mantén menos de 20 imports por archivo
+==== Menos de 20 imports por archivo
 
 Un archivo fuente con demasiados imports es una señal de que la clase tiene demasiadas dependencias y probablemente estas cayendo en el antipatron del `God Object`, o lo que es lo mismo, estas rompiendo el principio single responsability. Considera en su lugar refactorizar la clase en múltiples clases más cohesivas.
 
@@ -2953,7 +3313,7 @@ import com.miapp.inventory.*;
 // ... 20 más
 ----
 
-Si un archivo supera los 20 imports, revisa su diseño. No se trata de un límite estricto, sino de una señal de alerta para evaluar la cohesión de la clase.
+Si un archivo supera los 20 imports, es síntoma de que debes replantearte el diseño de tu clase.
 
 ==== Organización de imports
 
@@ -3023,18 +3383,168 @@ public class CircleAreaTest {
 ----
 
 === Testing
- ==== Convención de nombres de tests
- ==== Enfoca a los requerimientos no al coverage
- ==== Pruebas pequeñas, especificas y deterministas
- ==== Los test deben permanecer aislados
- ==== Test Singletons con injección de dependencias
- ==== Test parametrizados
- ==== Uns suit de test por clase
- ==== Usa mocks antes que 'fake classes'
- ==== Assert solo a lo que estas haciendo test
- ==== Usa TDD
 
+==== Convención de nombres para los tests
 
+Los nombres de los métodos de test deben ser descriptivos y reflejar el escenario que están probando. La convención más utilizada es el formato `GivenWhenThen` o una variante que indique claramente qué se prueba y qué se espera.
+
+En general el nombre del método de test debe ser suficiente para entender qué se está probando sin necesidad de leer la implementación.
+
+[source,java]
+----
+// correcto, usando la estructura Given_When_Then
+@Test
+void givenValidOrder_whenProcess_thenOrderIsSaved() {
+  Order order = new Order("123", BigDecimal.TEN);
+  orderService.process(order);
+  assertThat(order.getStatus()).isEqualTo(Status.PROCESSED);
+}
+
+// también correcto, usando la estructura should_When
+@Test
+void shouldThrowException_whenOrderIsNull() {
+  assertThatThrownBy(() -> orderService.process(null))
+      .isInstanceOf(IllegalArgumentException.class);
+}
+----
+
+==== Enfoca los tests a los requerimientos, no al coverage
+
+El objetivo de los tests no es alcanzar un porcentaje de cobertura arbitrario (¿80%? ¿100%?), sino verificar que el código cumple con los requisitos funcionales y no funcionales del sistema. Céntrate en probar los casos de uso y los límites del dominio, no en cubrir cada línea de código (en todo caso, eso debería ser un efecto colateral).
+
+También hay que tener presente que cubrir el 100% del código no garantiza que tu sistema funcione correctamente. Un test que no verifica un comportamiento real es ruido que dificulta el mantenimiento. Prioriza la calidad y relevancia de los tests sobre la cantidad.
+
+==== Pruebas pequeñas, específicas y deterministas
+
+Cada test debe verificar una única cosa y hacerlo de forma determinista. Un test que falla intermitentemente o que depende del orden de ejecución es un problema grave que debe corregirse inmediatamente.
+
+[source,java]
+----
+// incorrecto, el test verifica demasiadas cosas
+@Test
+void testOrderProcessing() {
+  Order order = new Order();
+  order.addItem(new Item("Laptop", 1));
+  orderService.validate(order);
+  orderService.applyDiscount(order);
+  orderService.save(order);
+  assertThat(order.getStatus()).isEqualTo(Status.COMPLETED);
+  assertThat(order.getTotal()).isLessThan(1000);
+}
+
+// correcto
+@Test
+void whenOrderHasOneItem_thenTotalIsCorrect() {
+  Order order = new Order();
+  order.addItem(new Item("Laptop", 1));
+  assertThat(order.getTotal()).isEqualTo(1000);
+}
+
+@Test
+void whenOrderContainsValidItems_thenStatusIsCompleted() {
+  Order order = new Order();
+  order.addItem(new Item("Laptop", 1));
+  orderService.process(order);
+  assertThat(order.getStatus()).isEqualTo(Status.COMPLETED);
+}
+----
+
+==== Los tests deben permanecer aislados
+
+Un test no debe depender de la ejecución de otros tests. Cada test debe poder ejecutarse de forma independiente y en cualquier orden.
+
+==== Testea Singletons con inyección de dependencias
+
+Los Singletons dificultan los tests porque mantienen estado global. Si necesitas testear un Singleton, asegúrate de que su estado pueda ser reseteado entre tests mediante inyección de dependencias o proporciona un método de reset para los tests.
+
+[source,java]
+----
+// correcto
+public class ConfigManager {
+  private static ConfigManager instance;
+  private final Properties properties;
+
+  private ConfigManager(Properties properties) {
+    this.properties = properties;
+  }
+
+  public static synchronized ConfigManager getInstance(Properties properties) {
+    if (instance == null)
+      instance = new ConfigManager(properties);
+    return instance;
+  }
+
+  public static synchronized void resetInstance() {
+    instance = null;
+  }
+}
+
+@BeforeEach
+void setup() {
+  ConfigManager.resetInstance();
+}
+
+@Test
+void whenConfigManagerIsInitialized_thenPropertiesAreLoaded() {
+  Properties testProps = new Properties();
+  testProps.setProperty("key", "value");
+  ConfigManager config = ConfigManager.getInstance(testProps);
+  assertThat(config.getProperty("key")).isEqualTo("value");
+}
+----
+
+==== Usa tests parametrizados para múltiples casos
+
+Los tests parametrizados reducen la duplicación de código cuando necesitas probar el mismo comportamiento con diferentes entradas y salidas esperadas.
+
+[source,java]
+----
+// correcto
+@ParameterizedTest
+@CsvSource({
+  "2, 3, 5",
+  "0, 0, 0",
+  "-1, 1, 0",
+  "100, -50, 50"
+})
+void whenAddingNumbers_thenResultIsCorrect(int a, int b, int expected) {
+  Calculator calculator = new Calculator();
+  assertThat(calculator.add(a, b)).isEqualTo(expected);
+}
+----
+
+==== Una suite de tests por clase
+
+Cada clase de producción debe tener su correspondiente clase de test facilitando así la localización de los tests y mantiene la relación uno a uno entre código y pruebas. Los tests de integración pueden tener su propia estructura, pero la regla general es una clase de test por clase de producción.
+
+==== Usa mocks antes que `fake classes`
+
+Para aislar cada unit test, utiliza mocks en lugar de crear implementaciones falsas de dependencias. Los mocks son más flexibles, permiten verificar interacciones y son más fáciles de mantener que clases fakes escritas a mano.
+
+==== Haz `Assert` solo sobre lo que estás testeando
+
+Un test debe contener únicamente aserciones que verifiquen el comportamiento específico que está probando. Evita añadir aserciones adicionales que no estén directamente relacionadas con el escenario del test.
+
+[source,java]
+----
+// incorrecto, aserciones no relacionadas
+@Test
+void whenOrderIsValid_thenProcessed() {
+  Order order = new Order("123", BigDecimal.TEN);
+  orderService.process(order);
+  assertThat(order.getStatus()).isEqualTo(Status.PROCESSED);
+  assertThat(order.getTotal()).isGreaterThan(BigDecimal.ZERO);
+  assertThat(order.getItems()).isNotEmpty();
+}
+
+// correcto
+@Test
+void whenOrderIsValid_thenStatusIsProcessed() {
+  Order order = new Order("123", BigDecimal.TEN);
+  orderService.process(order);
+  assertThat(order.getStatus()).isEqualTo(Status.PROCESSED);
+}
+----
 
 === Comentarios
 
