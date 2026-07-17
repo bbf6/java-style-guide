@@ -1468,7 +1468,7 @@ class PatientsScheduler
 }
 ----
 
-No debe haber ninguna línea en blanco de separación entre la declaración de una clase y su condenido.
+No debe haber ninguna línea en blanco de separación entre la declaración de una clase y su contenido.
 
 [source,java]
 ----
@@ -1496,13 +1496,21 @@ public class ImageAnalizer {
 El orden de los elementos dentro de una clase son de arriba a abajo:
 
 1.- Constantes
+
 2.- Variables estáticas
+
 3.- Métodos estáticos
+
 4.- Valores de instancia
+
 5.- Variables de instancia
+
 6.- Constructores (del más simple al más elaborado)
+
 7.- Getters y setters
+
 8.- Métodos de instancia
+
 9.- Clases anidadas
 
 Cada una de estas secciones va separada con una línea vacía de separación.
@@ -1577,17 +1585,21 @@ class Pattern {
 
 Ha de notarse que en la sección de constructores tiene más prioridad la complejidad y número de parámetros que el modificador de accesos. En general, la complejidad de las sobrecargas de métodos tiene más relevancia que los modificadores de acceso.
 
-==== Propiedades
+==== Atributos
 
 Todos los atributos de tu clase deben ser privados. Punto.
 
-Si necesitas acceder a dicho valor desde una clase externa hazlo a travéz de un getter.
+Todo atributo que no cambie de valor durante el ciclo de vida de la instancia debe ser marcado como `final`.
 
-Si necesitas modificar dicho valor desde una clase externa hazlo a travéz de un setter.
+==== Propiedades
 
-Si necesitas acceder a dicho valor desde una clase heredada hazlo a través de un getter.
+Si necesitas acceder a un atributo desde una clase externa hazlo a travéz de un getter.
 
-Si necesitas modificar dicho valor desde una clase heredada hazlo a través de un setter.
+Si necesitas modificar un atributo desde una clase externa hazlo a travéz de un setter.
+
+Si necesitas acceder a un atributo desde una clase heredada hazlo a través de un getter.
+
+Si necesitas modificar un atributo desde una clase heredada hazlo a través de un setter.
 
 Los getters y setters tienen su contenido en una línea a parte de donde se establece su firma.
 
@@ -1608,9 +1620,35 @@ Si tu attributo no necesita ser modificado después de la crecación de la insta
 
 Si el valor no va a cambiar desde la compilación, entonces lo que necesitas una constante.
 
+Las propiedades generalmente solo tienen el objetivo de mutar o exponer atributos, pero también pueden realizar otras operaciones intermedias siempre y cuando no sean demasiado complejas ni extensas. Dicho esto, si una propiedad con una operación intermedia es usada de forma exhaustiva, es preferible crear un atributo de caché para hacer dicho cálculo la menor cantidad de veces posible.
+
+[source,java]
+----
+// correcto
+public int getFullName() {
+  return name + " " + lastName + " " + motherLastName;
+}
+
+// también correcto si `getFullName` es llamado demasiadas veces
+private String fullName;
+
+public void setName(String value) {
+  name = value;
+  fullName = name + " " + lastName + " " + motherLastName;
+}
+
+public void setLastName() { ... }
+
+public void setMotherLastName() { ... }
+
+public int getFullName() {
+  return fullName;
+}
+----
+
 ==== Métodos
 
-Todo metodo deberia interactuar leyendo o modificando por lo menos un atributo de la clase, si no lo hace, debes replantearte si dicho metodo pertenece realmente a la clase
+Todo metodo debería interactuar leyendo o modificando por lo menos un atributo de la clase, si no lo hace, debes replantearte si dicho metodo pertenece realmente a la clase.
 
 ==== Una clase por archivo
 
@@ -1624,7 +1662,7 @@ Visto de otra forma, escribe todo tu código privado y luego ve abriendo su acce
 
 ==== Clases anidadas
 
-Existen varias circusnstancias bajo las cuales es sensato utilizar clases anidadas. A continuación se enuncian algunas de ellas y también algunas alternativas para evitar sobresaturar de información tus clases. Por ejemplo, para aislar una clase X que a nivel semántico y de dominio del sistema no tiene sentido que sea accesible exclusivamente por otra clase Y.
+Existen varias circunstancias bajo las cuales es sensato utilizar clases anidadas. A continuación se enuncian algunas de ellas y también algunas alternativas para evitar sobresaturar de información tus clases. Por ejemplo, para aislar una clase `X` que a nivel semántico y de dominio del sistema no tiene sentido que sea accesible exclusivamente por otra clase `Y`.
 
 [source,java]
 ----
@@ -1716,9 +1754,9 @@ Utiliza `static imports` cuando lo veas posible para simplificar la lectura de t
 
 ==== Variables estáticas
 
-Las variables estaticas, son dentro de Java variables globales. Evita en la medida de lo posible su uso.
+Las variables estáticas, son dentro de Java variables globales. Evita en la medida de lo posible su uso.
 
-Si tienes una razón de peso para el uso de una variable global, asegurate de que sea privada. Y si necesitas modificarla desde un punto externo a la clase en que estás declarada, hazlo a través de métodos estáticos en la misma clase.
+Si tienes una razón de peso para el uso de una variable global, asegurate de que sea privada. Y si necesitas modificarla desde un punto externo a la clase en que está declarada, hazlo a través de métodos estáticos en la misma clase.
 
 También considera la opción de usar un singleton en su lugar.
 
@@ -1784,13 +1822,13 @@ class User { ... }
 class ServiceAccount extends User { ... }
 ----
 
-Si la razón por la que quieres implementar herencia es porque necesitas una determinada funcinalidad o caracteristica de la clase base y no quieres duplicar código, entonces debes replantearte si dicha funcionalidad realmente pertenece a la clase base en primer lugar. Modificar las preconcepciones que tenemos sobre qué es y que no es parte de nuestras entidades (refactorizar nuestros diseños) es parte natural del ciclo de vida de desarrollo de todo proyecto.
+Si la razón por la que quieres implementar herencia es porque necesitas una determinada funcionalidad o caracteristica de la clase base y no quieres duplicar código, entonces debes replantearte si dicha funcionalidad realmente pertenece a la clase base en primer lugar. Modificar las preconcepciones que tenemos sobre qué es y que no es parte de nuestras entidades (refactorizar nuestros diseños) es parte natural del ciclo de vida de desarrollo de todo proyecto.
 
 ==== Composición antes que herencia
 
 Debes considerar a la herencia como la última opción disponible. Esto debe ser así pues su implementación es algo que solo se puede hacer una vez y su refactorización resulta complicada debido al alto acoplamiento que genera entre la clase base y la clase heredada.
 
-Diseña tus clases en base a composición antes que en base a herencia. La composición ofrece una mayor flexibilidad con menor acoplamiento, e incluso permite un mayor encapsulamiento de responsabilidades.
+Diseña tus clases en base a composición antes que en base a herencia. La composición ofrece una mayor flexibilidad con menor acoplamiento, e incluso permite un mayor encapsulamiento de responsabilidades e inyección de dependencias.
 
 La composición se basa en mantener instancias de otras clases en vez de heredar el comportamiento completo, de modo que es más fácil limitar el uso de la clase componente y al mismo tiempo es más fácil expandir la funcionalidad de la clase compuesta a través de múltiples componentes para realizar todas sus tareas.
 
@@ -1837,7 +1875,7 @@ interface Taxeable { ... }
 interface Addressable { ... }
 
 class User implements Authenticable, Authorizable, Taxeable, Addressable {}
-class ServiceAccount implements Authenticable, Authorizable
+class ServiceAccount implements Authenticable, Authorizable {}
 
 private void login(Authenticable prospect) { ... }
 ----
@@ -1855,8 +1893,11 @@ Si encuentras que necesitas muchos niveles, probablemente estés abusando de la 
 El principio de Liskov establece que los objetos de una subclase deben poder sustituir a objetos de la superclase sin alterar el comportamiento esperado del programa.
 
 En la práctica, esto significa que la subclase no debe:
+
 - Reforzar las precondiciones (requisitos de entrada) de los métodos de la superclase.
+
 - Lanzar excepciones que no sean declaradas o esperadas por la superclase.
+
 - Cambiar el estado interno de manera que viole las invariantes de la superclase.
 
 Si al crear una subclase te ves obligado a anular muchos métodos y dejar otros sin implementar o lanzando excepciones, es que estás rompiendo el principo y probablemente deberías usar composición o refactorizar tus clases.
@@ -1895,7 +1936,7 @@ interface Schedulable {
 class Executable implements Worker, Loggable {}
 ----
 
-Al segregar interfaces, el código cliente puede depender únicamente de la interfaz que necesita (Principio de Inversión de Dependencias). Esto facilita las pruebas unitarias (mocking) y desacopla los módulos.
+Al segregar interfaces, el código cliente puede depender únicamente de la interfaz que necesita así que también terminas cumpliendo con el principio de inversión de dependencias. Esto facilita las pruebas unitarias y desacopla los módulos.
 
 ==== Composición antes que herencia múltiple
 
@@ -1903,19 +1944,19 @@ Java permite el polimorfismo a través la implementación de interfaces, sin emb
 
 Aunque son útiles, abusar de ellos para compartir lógica compleja entre interfaces introduce herencia múltiple.
 
-Por ello, cuando necesites compartir comportamiento o estado entre diferentes implementaciones de interfaces, utiliza composición en lugar de heredar comportamiento a través de métodos `default` complejos
+Por ello, cuando necesites compartir comportamiento o estado entre diferentes implementaciones de interfaces, utiliza composición en lugar de heredar comportamiento a través de métodos `default` complejos.
 
 === Paquetes
 
 ==== Limita la interfaz publica
 
-Un paquete debe exponer únicamente aquellos tipos que son necesarios para que otros paquetes interactúen con su funcionalidad. Todo lo que no sea parte de la API pública debe quedar dentro de la interfaz privada del paquete.
+Un paquete debe exponer únicamente aquellos tipos que son necesarios para que otros paquetes interactúen con su funcionalidad. Todo lo que no necesites exponer hacia afuera del paquete debe quedar dentro de la interfaz privada del paquete (caja negra).
 
 Esto reduce el acoplamiento y te permite modificar la implementación interna de forma transparente para los usarios del paquete.
 
 [source,java]
 ----
-package com.myapp.scheduler;
+package com.example.scheduler;
 
 // al ser publicos, Scheduler y Activity pueden ser importados fuera del package
 public class Scheduler {}
@@ -1930,11 +1971,11 @@ class interpreter {}
 
 Cada paquete debe encapsular sus propias decisiones de diseño. Si un requisito cambia dentro de la responsabilidad de un paquete, el impacto debe limitarse a ese paquete. Los paquetes externos solo dependen de la interfaz pública, y esa interfaz debe ser estable en la medida de lo posible.
 
-Si al modificar un requisito interno te ves obligado a cambiar la API pública de tu paquete, es señal de que la interfaz pública no está bien abstraída. Revisa el diseño para separar lo que cambia de lo que permanece estable.
+Si al modificar un requisito interno te ves obligado a cambiar la interfaz pública de tu paquete, es señal de que no está bien abstraída. Revisa el diseño para separar lo que cambia de lo que permanece estable.
 
 ==== No deben haber depencencias circulares entre paquetes
 
-Las dependencias circulares (paquete A depende de B, y B depende de A) generan un alto acoplamiento, dificultan la comprensión del sistema y complica la modularización.
+Las dependencias circulares (paquete `A` depende de `B`, y `B` depende de `A`) generan un alto acoplamiento, dificultan la comprensión del sistema y complica la modularización.
 
 Los paquetes idealmente deberían formar un grafo acíclico dirigido (a.k.a. DAG).
 
@@ -1956,17 +1997,17 @@ La abstracción en cuestión es por si misma su propia documentación y por lo t
 
 [source,bash]
 ----
-com.myapp.pubsub
+com.example.pubsub
   Publisher.java
   Subscriber.java
   Message.java
   Topic.java
 
-com.myapp.pubsub.kafka
+com.example.pubsub.kafka
   KafkaPublisher.java
   KafkaSubscriber.java
 
-com.myapp.pubsub.mosquitto
+com.example.pubsub.mosquitto
   MosquittoPublisher.java
   MosquittoSubscriber.java
 ----
@@ -1987,7 +2028,7 @@ Los paquetes que ya forman parte de la arquitectura no necesitan de dicho archiv
  * formatting strategies. Implementations should be stateless and thread-safe
  * whenever possible.
  */
-package com.myapp.lib.format;
+package com.example.lib.format;
 ----
 
 === Convención de nomenclatura
@@ -2000,6 +2041,9 @@ Los nombres de archivos se escriben en PascalCase y deben llevar el mismo nombre
 ----
 # incorrecto
 answerAnalizer.java
+
+# incorrecto
+Answeranalizer.java
 
 # incorrecto
 answer-analizer.java
@@ -2019,6 +2063,9 @@ Los nombres de los paquetes (a.k.a. directorios) se escriben todo en minusculas 
 ----
 // incorrecto
 package com.example.bodyParser;
+
+// incorrecto
+package com.example.Bodyparser;
 
 // incorrecto
 package com.example.BodyParser;
@@ -2170,7 +2217,7 @@ class DateTimeUtils {}
 class DateTimeHelpers {}
 
 // aún mejor
-class DateTimeOperations {}
+class DateTimeAritmetics {}
 ----
 
 Nombra a tus entidades físicas por lo que son.
@@ -2181,7 +2228,7 @@ Nombra a tus entidades físicas por lo que son.
 public class EnvironmentFileReader {}
 
 // correcto
-public class Environment
+public class Environment {}
 
 // incorrecto
 class ClientData {}
@@ -2240,7 +2287,7 @@ class Docker implements Shippable {}
 class Product implements Shippable {}
 ----
 
-En el caso de interfaces funcionales, nombralas por el rol que cumplen, dentro su método debe ser llamado como la verbalización de dicho rol.
+En el caso de interfaces funcionales, nombralas por el rol que cumplen. Dentro, su método debe ser llamado como la verbalización de dicho rol.
 
 [source,java]
 ----
@@ -2763,6 +2810,18 @@ if (condition)
 // mejor
 if (condition) doSomething();
 ----
+
+Suelen darse dos argumentos en contra de esta convención:
+
+1.- Es preferible añadir las llaves siempre sin importar cuantas líneas tenga el bloque ya que cuando llegue el momento de refactorizar, no habrá oportunidad para un equivoco si las llaves ya están allí (Es mejor tenerlo y no necesitarlo que necesitarlo y no tenerlo).
+
+2.- Sin las llaves es más dificil leer qué instrucción pertenece o no al bloque, esto es especialmente confuso en situaciones donde hay muchos niveles de scopes en un espacio muy reducido de código.
+
+Los contra argumentos son los siguientes:
+
+1.- Poner llaves a un `if` de forma profilactica tiene la intención de eficientar la escritura de código. Sin embargo, si nos remitimos al comienzo de esta guía, la escritura de código es solamente el 20% del tiempo invertido de un programador, el otro 80% es lectura, y por lo tanto es mucho más beneficioso enfocarnos en que el código sea más fácil de leer que de escribir.
+
+2.- Poner llaves para evitar confusiones en partes del código donde hay diferentes niveles de scopes es una forma de solucionar los síntomas sin atacar al problema de raíz. Es decir, que si te cuesta distinguir a qué scope pertenece una línea de código, no es por falta de llaves, sino por que tienes demasiados scopes en el mismo lugar; refactoriza tú código para encapsular los scopes en métodos aislados.
 
 ==== Mueve evaluaciones complejas a métodos independientes
 
