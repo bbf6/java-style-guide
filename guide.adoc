@@ -1,3 +1,4 @@
+:source-highlighter: rouge
 :version: 0.1.0
 == Guia de estilos para Java.
 :reproducible:
@@ -552,26 +553,26 @@ Declaraciones de arrays con una lista de valores demasiado grandes se listan en 
 [source,java]
 ----
 String[] countries = {
-  'Argentina',
-  'Brasil',
-  'Canadá',
-  'Chile',
-  'Colombia',
-  'España',
-  'Estados Unidos',
-  'Francia',
-  'Italia',
-  'Japón',
-  'México',
-  'Perú',
-  'Portugal',
-  'Reino Unido',
-  'Sudáfrica',
-  'Alemania',
-  'Australia',
-  'China',
-  'India',
-  'Rusia'
+  "Argentina",
+  "Brasil",
+  "Canadá",
+  "Chile",
+  "Colombia",
+  "España",
+  "Estados Unidos",
+  "Francia",
+  "Italia",
+  "Japón",
+  "México",
+  "Perú",
+  "Portugal",
+  "Reino Unido",
+  "Sudáfrica",
+  "Alemania",
+  "Australia",
+  "China",
+  "India",
+  "Rusia"
 }
 ----
 
